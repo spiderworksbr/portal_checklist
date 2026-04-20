@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Histórico e Relatórios - Be8 Go</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <style>
+        :root {
+            --bg: #f2f2f7; --card: #ffffff; --text: #1c1c1e; --text-muted: #8e8e93; --border: #c6c6c8; --accent: #007aff; --danger: #ff3b30; --success: #34c759; --warning: #ff9500;
+        }
+        body.force-dark {
+            --bg: #000000; --card: #1c1c1e; --text: #f2f2f7; --text-muted: #98989d; --border: #38383a; --accent: #0a84ff; --danger: #ff453a; --success: #32d74b; --warning: #ffd60a;
+        }
+
+        body { background-color: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; margin: 0; padding: 0; padding-bottom: 80px; }
+        
+        .header-history { position: sticky; top: 0; background: var(--card); padding: 15px 20px; z-index: 10; border-bottom: 1px solid var(--border); margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .header-title { font-size: 18px; font-weight: 700; color: var(--accent); display: flex; align-items: center; gap: 8px; }
+        
+        .apple-card { background: var(--card); border-radius: 16px; padding: 20px; margin: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); border: 1px solid var(--border); }
+        
+        input[type="text"], select { width: 100%; padding: 14px; margin-bottom: 15px; border-radius: 10px; border: 1px solid var(--border); background: var(--bg); color: var(--text); font-size: 15px; box-sizing: border-box; }
+        .filter-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .btn-apple { background: var(--accent); color: #fff; border: none; padding: 14px 20px; border-radius: 12px; font-size: 16px; font-weight: 600; cursor: pointer; width: 100%; }
+
+        /* Lista de Registos */
+        .record-card { background: var(--bg); border: 1px solid var(--border); border-radius: 12px; padding: 15px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; gap: 15px;}
+        .record-card.aprovado { border-left: 5px solid var(--success); }
+        .record-card.reprovado { border-left: 5px solid var(--danger); }
+        
+        .record-info { flex: 1; }
+        .r-title { font-weight: 700; font-size: 16px; margin-bottom: 5px; color: var(--text); }
+        .r-sub { font-size: 13px; color: var(--text-muted); margin-bottom: 3px; display: flex; gap: 10px; align-items: center;}
+        
+        .badge { font-size: 10px; padding: 4px 8px; border-radius: 8px; font-weight: 700; text-transform: uppercase; }
+        .badge-success { background: rgba(52, 199, 89, 0.15); color: var(--success); }
+        .badge-danger { background: rgba(255, 59, 48, 0.15); color: var(--danger); }
+        
+        .record-actions { display: flex; flex-direction: column; gap: 8px; }
+        .btn-sm { padding: 8px 12px; border-radius: 8px; font-size: 12px; font-weight: 600; border: 1px solid var(--border); background: var(--card); color: var(--text); cursor: pointer; text-align: center;}
+        .btn-sm.pdf { border-color: rgba(255, 59, 48, 0.5); color: var(--danger); background: rgba(255, 59, 48, 0.05); }
+
+        /* Pop-up Detalhes */
+        .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 9998; backdrop-filter: blur(5px); }
+        .modal-content { display: none; position: fixed; top: 5%; left: 50%; transform: translateX(-50%); width: 90%; max-width: 600px; height: 90%; background: var(--card); border-radius: 16px; z-index: 9999; box-shadow: 0 10px 40px rgba(0,0,0,0.2); display: flex; flex-direction: column; }
+        .modal-header { padding: 15px 20px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+        .modal-header h3 { margin: 0; font-size: 16px; }
+        .modal-body { padding: 20px; overflow-y: auto; flex: 1; }
+        .modal-close { background: var(--bg); border: none; font-size: 16px; color: var(--text-muted); cursor: pointer; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+
+        .detail-row { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--border); font-size: 14px; }
+        .detail-q { flex: 3; padding-right: 15px; font-weight: 500;}
+        .detail-a { flex: 1; text-align: right; font-weight: 700; display: flex; align-items: center; justify-content: flex-end; gap: 10px;}
+        .obs-text { font-size: 12px; color: var(--danger); padding: 5px 10px; background: rgba(255, 59, 48, 0.05); border-radius: 6px; margin-top: 5px; }
+
+        /* Documento PDF Oculto (Apenas para geração) */
+        #pdf-template { display: none; }
+    </style>
+</head>
+<body>
+    <div id="menu-container"></div> <div class="container" style="max-width: 800px; margin: 0 auto;">
+        <div class="header-history">
+            <div class="header-title"><span>🕒</span> Histórico de Checklist</div>
+        </div>
+
+        <div class="apple-card">
+            <h2 style="margin-top:0; font-size:16px;">Buscar Registos</h2>
+            
+            <label>Transportadora</label>
+            <select id="filtroTransp">
+                <option value="">Todas as Transportadoras</option>
+            </select>
+            
+            <div class="filter-grid">
+                <div>
+                    <label>Busca (Placa, Nome...)</label>
+                    <input type="text" id="filtroBusca" placeholder="Pesquisar...">
+                </div>
+                <div style="display: flex; align-items: flex-end;">
+                    <button class="btn-apple" onclick="carregarHistorico()">Pesquisar</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="apple-card" style="padding: 15px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 15px;">
+                <h2 style="margin:0; font-size:16px;">Resultados</h2>
+                <span id="contador-resultados" style="font-size:12px; color:var(--text-muted);">A carregar...</span>
+            </div>
+            
+            <div id="lista-historico"></div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="modalOverlay" onclick="fecharModal()"></div>
+    <div class="modal-content" id="modalDetalhes" style="display: none;">
+        <div class="modal-header">
+            <h3>Detalhes do Checklist</h3>
+            <button class="modal-close" onclick="fecharModal()">✕</button>
+        </div>
+        <div class="modal-body" id="modalBodyContent">
+            </div>
+    </div>
+
+    <div id="pdf-template" style="padding: 40px; font-family: Helvetica, Arial, sans-serif; color: #333; background: #fff;">
+        <div style="text-align: center; border-bottom: 2px solid #007aff; padding-bottom: 20px; margin-bottom: 20px;">
+            <h1 style="margin: 0; color: #007aff; font-size: 24px;">Relatório de Checklist SSMA</h1>
+            <h3 style="margin: 5px 0 0 0; color: #666; font-size: 14px;">SpiderWorks | Be8 Go</h3>
+        </div>
+        
+        <table style="width: 100%; margin-bottom: 30px; font-size: 14px; border-collapse: collapse;">
+            <tr>
+                <td style="padding: 8px; border: 1px solid #ddd; background: #f9f9f9; font-weight: bold; width: 30%;">Data e Hora:</td>
+                <td style="padding: 8px; border: 1px solid #ddd;" id="pdf-data"></td>
+            </tr>
+            <tr>
+                <td style="padding: 8px; border: 1px solid #ddd; background: #f9f9f9; font-weight: bold;">Status Final:</td>
+                <td style="padding: 8px; border: 1px solid #ddd; font-weight: bold;" id="pdf-status"></td>
+            </tr>
+            <tr>
+                <td style="padding: 8px; border: 1px solid #ddd; background: #f9f9f9; font-weight: bold;">Transportadora:</td>
+                <td style="padding: 8px; border: 1px solid #ddd;" id="pdf-transp"></td>
+            </tr>
+            <tr>
+                <td style="padding: 8px; border: 1px solid #ddd; background: #f9f9f9; font-weight: bold;">Motorista:</td>
+                <td style="padding: 8px; border: 1px solid #ddd;" id="pdf-mot"></td>
+            </tr>
+            <tr>
+                <td style="padding: 8px; border: 1px solid #ddd; background: #f9f9f9; font-weight: bold;">Placa Cavalo:</td>
+                <td style="padding: 8px; border: 1px solid #ddd;" id="pdf-cav"></td>
+            </tr>
+            <tr>
+                <td style="padding: 8px; border: 1px solid #ddd; background: #f9f9f9; font-weight: bold;">Placa Carreta:</td>
+                <td style="padding: 8px; border: 1px solid #ddd;" id="pdf-car"></td>
+            </tr>
+            <tr>
+                <td style="padding: 8px; border: 1px solid #ddd; background: #f9f9f9; font-weight: bold;">Validade Checklist:</td>
+                <td style="padding: 8px; border: 1px solid #ddd;" id="pdf-val"></td>
+            </tr>
+        </table>
+
+        <h3 style="border-bottom: 1px solid #ccc; padding-bottom: 5px;">Questionário Realizado</h3>
+        <table style="width: 100%; border-collapse: collapse; font-size: 12px;" id="pdf-respostas">
+            </table>
+
+        <div id="pdf-fotos-container" style="margin-top: 30px;">
+            <h3 style="border-bottom: 1px solid #ccc; padding-bottom: 5px;">Evidências Fotográficas</h3>
+            <div id="pdf-fotos" style="display: flex; flex-wrap: wrap; gap: 10px; margin-top: 15px;"></div>
+        </div>
+    </div>
+
+    <script src="menu.js"></script>
+
+    <script>
+        const token = localStorage.getItem('pb_token');
+        if (!token) window.location.href = 'login.html';
+
+        const POCKETBASE_URL = 'https://be8-be8-backend.i6qanl.easypanel.host';
+        const cabecalhosAuth = { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' };
+        
+        let todosRegistosGlobais = []; 
+        let bancoPerguntasCache = {}; // Para traduzir o ID da pergunta para o texto real
+
+        // 1. INICIALIZAÇÃO
+        async function init() {
+            await carregarFiltroTransportadoras();
+            await carregarBancoPerguntas(); // Precisa disto para traduzir o JSON de respostas
+            carregarHistorico();
+        }
+
+        async function carregarFiltroTransportadoras() {
+            try {
+                const res = await fetch(`${POCKETBASE_URL}/api/collections/transportadoras/records?perPage=100`, { headers: cabecalhosAuth });
+                const data = await res.json();
+                const sel = document.getElementById('filtroTransp');
+                if (data.items) {
+                    data.items.forEach(t => {
+                        const nome = t.razao_social || t.nome_fantasia || 'Sem Nome';
+                        sel.innerHTML += `<option value="${t.id}">${nome}</option>`;
+                    });
+                }
+            } catch(e) { console.error("Erro transportadoras:", e); }
+        }
+
+        async function carregarBancoPerguntas() {
+            try {
+                const res = await fetch(`${POCKETBASE_URL}/api/collections/site_checklist_banco_perguntas/records?perPage=500`, { headers: cabecalhosAuth });
+                const data = await res.json();
+                if (data.items) {
+                    data.items.forEach(p => {
+                        bancoPerguntasCache[p.id] = p.pergunta;
+                    });
+                }
+            } catch(e) { console.error("Erro perguntas:", e); }
+        }
+
+        // 2. BUSCA PRINCIPAL DE HISTÓRICO
+        async function carregarHistorico() {
+            const container = document.getElementById('lista-historico');
+            container.innerHTML = '<p style="text-align:center; color:var(--text-muted);">A procurar...</p>';
+
+            const fTransp = document.getElementById('filtroTransp').value;
+            const fBusca = document.getElementById('filtroBusca').value.toLowerCase();
+
+            let queryFilters = [];
+            if (fTransp) queryFilters.push(`transportadora_id='${fTransp}'`);
+            
+            let url = `${POCKETBASE_URL}/api/collections/site_checklist_registros/records?sort=-created&perPage=50&expand=transportadora_id,motorista_id,cavalo_id,carreta_id`;
+            if (queryFilters.length > 0) {
+                url += `&filter=(${encodeURIComponent(queryFilters.join(' && '))})`;
+            }
+
+            try {
+                const res = await fetch(url, { headers: cabecalhosAuth });
+                const data = await res.json();
+                
+                let registos = data.items || [];
+
+                // Filtro local por texto (Placa ou Nome)
+                if (fBusca) {
+                    registos = registos.filter(reg => {
+                        const m = reg.expand?.motorista_id?.nome?.toLowerCase() || '';
+                        const c = reg.expand?.cavalo_id?.placa?.toLowerCase() || '';
+                        const t = reg.expand?.carreta_id?.placa?.toLowerCase() || '';
+                        return m.includes(fBusca) || c.includes(fBusca) || t.includes(fBusca);
+                    });
+                }
+
+                todosRegistosGlobais = registos;
+                renderizarLista(registos);
+            } catch(e) { 
+                container.innerHTML = '<p style="text-align:center; color:var(--danger);">Erro de ligação.</p>'; 
+            }
+        }
+
+        function renderizarLista(registos) {
+            const container = document.getElementById('lista-historico');
+            document.getElementById('contador-resultados').innerText = `${registos.length} encontrados`;
+            
+            if(registos.length === 0) {
+                container.innerHTML = '<p style="text-align:center; color:var(--text-muted);">Nenhum registo encontrado.</p>';
+                return;
+            }
+
+            container.innerHTML = '';
+            
+            registos.forEach((reg, index) => {
+                const transportadora = reg.expand?.transportadora_id?.razao_social || 'Desconhecida';
+                const motorista = reg.expand?.motorista_id?.nome || 'Não informado';
+                const placaCavalo = reg.expand?.cavalo_id?.placa || 'Sem Placa';
+                const placaCarreta = reg.expand?.carreta_id?.placa || 'N/A';
+                
+                const dataCriacao = new Date(reg.created);
+                const dataStr = dataCriacao.toLocaleDateString('pt-PT') + " " + dataCriacao.toLocaleTimeString('pt-PT', {hour:'2-digit', minute:'2-digit'});
+                
+                let validadeStr = "Sem Validade";
+                if(reg.validade_cavalo) { validadeStr = new Date(reg.validade_cavalo).toLocaleDateString('pt-PT'); }
+
+                const badgeStatus = reg.status_final === 'Aprovado' 
+                    ? `<span class="badge badge-success">APROVADO</span>`
+                    : `<span class="badge badge-danger">REPROVADO</span>`;
+                
+                const cardClass = reg.status_final === 'Aprovado' ? 'aprovado' : 'reprovado';
+
+                const cardHTML = `
+                    <div class="record-card ${cardClass}">
+                        <div class="record-info">
+                            <div class="r-title">${transportadora}</div>
+                            <div class="r-sub"><span>📅 ${dataStr}</span> ${badgeStatus}</div>
+                            <div class="r-sub"><span>👤 ${motorista}</span></div>
+                            <div class="r-sub">
+                                <span>🚚 ${placaCavalo}</span>
+                                ${placaCarreta !== 'N/A' ? `<span>🔗 ${placaCarreta}</span>` : ''}
+                            </div>
+                            <div class="r-sub" style="margin-top: 5px;">⏳ Válido até: <strong>${validadeStr}</strong></div>
+                        </div>
+                        <div class="record-actions">
+                            <button class="btn-sm" onclick="abrirDetalhes(${index})">👁️ Detalhes</button>
+                            <button class="btn-sm pdf" onclick="gerarPDF(${index})">📄 Gerar PDF</button>
+                        </div>
+                    </div>
+                `;
+                container.innerHTML += cardHTML;
+            });
+        }
+
+        // 3. LÓGICA DO POP-UP (DETALHES)
+        function abrirDetalhes(index) {
+            const reg = todosRegistosGlobais[index];
+            const modalBody = document.getElementById('modalBodyContent');
+            
+            let respostasHTML = "";
+            let temRespostas = false;
+
+            if (reg.respostas_json) {
+                try {
+                    const ans = typeof reg.respostas_json === 'string' ? JSON.parse(reg.respostas_json) : reg.respostas_json;
+                    
+                    // Constrói as linhas do pop-up
+                    ['motorista', 'cavalo', 'carreta'].forEach(cat => {
+                        if(ans[cat]) {
+                            respostasHTML += `<div style="background:var(--border); padding:5px 10px; font-weight:700; font-size:12px; text-transform:uppercase; margin-top:15px; border-radius:4px;">${cat}</div>`;
+                            
+                            Object.keys(ans[cat]).forEach(perguntaId => {
+                                const resp = ans[cat][perguntaId];
+                                const perguntaTexto = bancoPerguntasCache[perguntaId] || "Pergunta Desconhecida";
+                                
+                                let respIcon = '✅';
+                                let respColor = 'var(--success)';
+                                if(resp === 'nao') { respIcon = '⚠️'; respColor = 'var(--warning)'; }
+                                if(resp === 'falha') { respIcon = '❌'; respColor = 'var(--danger)'; }
+                                if(resp === 'na') { respIcon = '➖'; respColor = 'var(--text-muted)'; }
+
+                                // Verifica se tem observação para esta falha
+                                let obsHTML = "";
+                                if (resp === 'falha' && reg.observacoes_avarias && reg.observacoes_avarias.includes(`(Item ${perguntaId})`)) {
+                                    // Extrai a observação específica (simplificado)
+                                    obsHTML = `<div class="obs-text">Nota registada nesta avaria.</div>`;
+                                }
+
+                                respostasHTML += `
+                                    <div class="detail-row" style="flex-direction: column;">
+                                        <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                                            <div class="detail-q">${perguntaTexto}</div>
+                                            <div class="detail-a" style="color: ${respColor}; text-transform:uppercase;">${resp} ${respIcon}</div>
+                                        </div>
+                                        ${obsHTML}
+                                    </div>
+                                `;
+                            });
+                            temRespostas = true;
+                        }
+                    });
+                } catch(e) { console.log("Erro a ler respostas", e); }
+            }
+
+            if (!temRespostas) respostasHTML = "<p>Sem respostas guardadas neste formato.</p>";
+
+            // Área de Fotos
+            let fotosHTML = "";
+            if (reg.fotos_evidencias && Array.isArray(reg.fotos_evidencias) && reg.fotos_evidencias.length > 0) {
+                fotosHTML = `<h4 style="margin-top:20px;">📸 Evidências Fotográficas</h4><div style="display:flex; gap:10px; overflow-x:auto;">`;
+                reg.fotos_evidencias.forEach(fotoName => {
+                    const urlFoto = `${POCKETBASE_URL}/api/files/site_checklist_registros/${reg.id}/${fotoName}`;
+                    fotosHTML += `<a href="${urlFoto}" target="_blank"><img src="${urlFoto}" style="width:100px; height:100px; object-fit:cover; border-radius:8px; border:1px solid var(--border);"></a>`;
+                });
+                fotosHTML += `</div>`;
+            }
+
+            modalBody.innerHTML = respostasHTML + fotosHTML;
+            document.getElementById('modalOverlay').style.display = 'block';
+            document.getElementById('modalDetalhes').style.display = 'flex';
+        }
+
+        function fecharModal() {
+            document.getElementById('modalOverlay').style.display = 'none';
+            document.getElementById('modalDetalhes').style.display = 'none';
+        }
+
+        // 4. GERAÇÃO DE PDF PROFISSIONAL
+        function gerarPDF(index) {
+            const reg = todosRegistosGlobais[index];
+            
+            // Preenche o Cabeçalho Oculto do PDF
+            const dataStr = new Date(reg.created).toLocaleString('pt-PT');
+            document.getElementById('pdf-data').innerText = dataStr;
+            
+            const elStatus = document.getElementById('pdf-status');
+            elStatus.innerText = reg.status_final;
+            elStatus.style.color = reg.status_final === 'Aprovado' ? '#34c759' : '#ff3b30';
+
+            document.getElementById('pdf-transp').innerText = reg.expand?.transportadora_id?.razao_social || 'N/A';
+            document.getElementById('pdf-mot').innerText = reg.expand?.motorista_id?.nome || 'N/A';
+            document.getElementById('pdf-cav').innerText = reg.expand?.cavalo_id?.placa || 'N/A';
+            document.getElementById('pdf-car').innerText = reg.expand?.carreta_id?.placa || 'N/A';
+            document.getElementById('pdf-val').innerText = reg.validade_cavalo ? new Date(reg.validade_cavalo).toLocaleDateString('pt-PT') : 'N/A';
+
+            // Preenche a Tabela de Respostas do PDF
+            const tabelaResp = document.getElementById('pdf-respostas');
+            tabelaResp.innerHTML = `
+                <tr style="background:#f0f0f0;">
+                    <th style="padding:8px; border:1px solid #ddd; text-align:left;">Pergunta</th>
+                    <th style="padding:8px; border:1px solid #ddd; width:15%;">Resposta</th>
+                </tr>
+            `;
+
+            if (reg.respostas_json) {
+                try {
+                    const ans = typeof reg.respostas_json === 'string' ? JSON.parse(reg.respostas_json) : reg.respostas_json;
+                    ['motorista', 'cavalo', 'carreta'].forEach(cat => {
+                        if(ans[cat]) {
+                            tabelaResp.innerHTML += `<tr><td colspan="2" style="background:#e0e0e0; font-weight:bold; padding:5px; text-transform:uppercase;">${cat}</td></tr>`;
+                            Object.keys(ans[cat]).forEach(perguntaId => {
+                                const resp = ans[cat][perguntaId].toUpperCase();
+                                const perguntaTexto = bancoPerguntasCache[perguntaId] || perguntaId;
+                                let cor = '#000';
+                                if(resp === 'FALHA') cor = '#ff3b30';
+                                if(resp === 'NÃO' || resp === 'NAO') cor = '#ff9500';
+                                
+                                tabelaResp.innerHTML += `
+                                    <tr>
+                                        <td style="padding:5px; border:1px solid #ddd;">${perguntaTexto}</td>
+                                        <td style="padding:5px; border:1px solid #ddd; font-weight:bold; color:${cor}; text-align:center;">${resp}</td>
+                                    </tr>
+                                `;
+                            });
+                        }
+                    });
+                } catch(e) {}
+            }
+
+            // Fotos no PDF
+            const containerFotos = document.getElementById('pdf-fotos');
+            containerFotos.innerHTML = '';
+            if (reg.fotos_evidencias && Array.isArray(reg.fotos_evidencias) && reg.fotos_evidencias.length > 0) {
+                document.getElementById('pdf-fotos-container').style.display = 'block';
+                reg.fotos_evidencias.forEach(fotoName => {
+                    const urlFoto = `${POCKETBASE_URL}/api/files/site_checklist_registros/${reg.id}/${fotoName}`;
+                    containerFotos.innerHTML += `<img src="${urlFoto}" style="width:200px; height:150px; object-fit:cover; border:1px solid #ccc; margin:5px;">`;
+                });
+            } else {
+                document.getElementById('pdf-fotos-container').style.display = 'none';
+            }
+
+            // Ativa o HTML2PDF
+            const elemento = document.getElementById('pdf-template');
+            elemento.style.display = 'block'; // Mostra temporariamente para capturar
+            
+            const opt = {
+                margin:       10,
+                filename:     `Checklist_${reg.expand?.cavalo_id?.placa || 'Relatorio'}.pdf`,
+                image:        { type: 'jpeg', quality: 0.98 },
+                html2canvas:  { scale: 2 },
+                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+
+            // Gera e depois esconde de novo
+            html2pdf().set(opt).from(elemento).save().then(() => {
+                elemento.style.display = 'none';
+            });
+        }
+
+        init();
+    </script>
+</body>
+</html>

@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Configurações SSMA - Be8 Go</title>
+    <style>
+        /* Variáveis Globais de Cores (Suporte Light/Dark) */
+        :root {
+            --bg: #f2f2f7; --card: #ffffff; --text: #1c1c1e; --text-muted: #8e8e93; --border: #c6c6c8; --accent: #007aff; --danger: #ff3b30; --success: #34c759; --warning: #ff9500;
+        }
+        body.force-dark {
+            --bg: #000000; --card: #1c1c1e; --text: #f2f2f7; --text-muted: #98989d; --border: #38383a; --accent: #0a84ff; --danger: #ff453a; --success: #32d74b; --warning: #ffd60a;
+        }
+
+        body { background-color: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; margin: 0; padding: 0; padding-bottom: 80px; transition: background-color 0.3s, color 0.3s; }
+        
+        .header-ssma { margin: 20px 15px; padding-bottom: 10px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+        .header-title { font-size: 22px; font-weight: 700; color: var(--text); display: flex; align-items: center; gap: 8px; }
+        
+        .apple-card { background: var(--card); border-radius: 16px; padding: 20px; margin: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); border: 1px solid var(--border); transition: background-color 0.3s; }
+        
+        input[type="text"], input[type="number"], select { width: 100%; padding: 14px; margin-bottom: 15px; border-radius: 10px; border: 1px solid var(--border); background: var(--bg); color: var(--text); font-size: 15px; box-sizing: border-box; -webkit-appearance: none; transition: background-color 0.3s, color 0.3s; }
+        
+        .grid-validade { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        
+        /* Botões Estilo Apple */
+        .btn-apple { background: var(--accent); color: #fff; border: none; padding: 14px 20px; border-radius: 12px; font-size: 16px; font-weight: 600; cursor: pointer; transition: 0.2s; text-align: center; display: inline-block; width: 100%; box-sizing: border-box;}
+        .btn-apple:active { opacity: 0.8; transform: scale(0.98); }
+        .btn-apple-outline { background: transparent; border: 2px solid var(--accent); color: var(--accent); padding: 12px 20px; border-radius: 12px; font-weight: 600; cursor: pointer; transition: 0.2s; text-align: center; }
+        .btn-apple-outline:active { background: rgba(0, 122, 255, 0.1); }
+
+        /* Botões Planilha */
+        .spreadsheet-actions { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 15px; }
+        .btn-sheet { padding: 12px; border-radius: 10px; font-weight: 600; font-size: 13px; cursor: pointer; border: 1px solid var(--border); background: var(--bg); color: var(--text); display: flex; align-items: center; justify-content: center; gap: 5px; transition: 0.2s; text-align: center;}
+        .btn-sheet.import { background: rgba(52, 199, 89, 0.1); color: var(--success); border-color: var(--success); }
+        .btn-sheet.export { background: rgba(0, 122, 255, 0.1); color: var(--accent); border-color: var(--accent); }
+        .btn-sheet:active { opacity: 0.7; }
+
+        @media (max-width: 600px) {
+            .spreadsheet-actions { grid-template-columns: 1fr; }
+        }
+
+        /* Apple Switch Toggle */
+        .switch { position: relative; display: inline-block; width: 50px; height: 30px; flex-shrink: 0; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: var(--border); transition: .4s; border-radius: 34px; }
+        .slider:before { position: absolute; content: ""; height: 22px; width: 22px; left: 4px; bottom: 4px; background-color: white; transition: .4s; border-radius: 50%; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+        input:checked + .slider { background-color: var(--success); }
+        input:checked + .slider:before { transform: translateX(20px); }
+
+        /* Lista de Perguntas */
+        .pergunta-item { display: flex; justify-content: space-between; align-items: flex-start; padding: 15px 0; border-bottom: 1px solid var(--border); gap: 15px;}
+        .pergunta-item:last-child { border-bottom: none; }
+        .pergunta-texto { font-size: 15px; font-weight: 600; margin-bottom: 8px; line-height: 1.3;}
+        .pergunta-badges { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 5px; }
+        .badge { font-size: 11px; padding: 4px 8px; border-radius: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;}
+        
+        .badge-mot { background: rgba(0, 122, 255, 0.15); color: var(--accent); }
+        .badge-cav { background: rgba(255, 149, 0, 0.15); color: var(--warning); }
+        .badge-car { background: rgba(52, 199, 89, 0.15); color: var(--success); }
+        .badge-foto { background: rgba(255, 59, 48, 0.15); color: var(--danger); border: 1px solid var(--danger);}
+
+        .form-add { background: var(--bg); padding: 20px; border-radius: 14px; border: 1px solid var(--border); margin-bottom: 10px; transition: background-color 0.3s; }
+        .form-row { display: flex; align-items: center; justify-content: space-between; background: var(--card); padding: 12px 15px; border-radius: 10px; margin-bottom: 15px; border: 1px solid var(--border); transition: background-color 0.3s; }
+        
+        .action-btns { display: flex; gap: 8px; flex-direction: column; align-items: flex-end;}
+        .btn-icon { background: var(--card); border: 1px solid var(--border); color: var(--text); padding: 8px 12px; border-radius: 8px; cursor: pointer; font-size: 13px; font-weight: 600; display: flex; align-items: center; gap: 5px; transition: 0.2s;}
+        .btn-icon:hover { filter: brightness(0.9); }
+        .btn-icon.edit { color: var(--accent); }
+        .btn-icon.delete { color: var(--danger); border-color: rgba(255, 59, 48, 0.3); background: rgba(255, 59, 48, 0.05); }
+    </style>
+</head>
+<body>
+    <div id="menu-container"></div> <div class="container" style="max-width: 800px; margin: 0 auto;">
+        
+        <div class="header-ssma">
+            <div class="header-title">⚙️ Painel SSMA</div>
+        </div>
+
+        <div class="apple-card">
+            <h2 style="margin-top: 0; font-size: 18px;">Prazos de Validade (Dias)</h2>
+            <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 15px;">Defina a validade de cada checklist.</p>
+            
+            <input type="hidden" id="id_validade"> 
+            
+            <div class="grid-validade">
+                <div><label>Cavalo Mecânico</label><input type="number" id="v_cavalo" placeholder="Ex: 30"></div>
+                <div><label>Carreta (Padrão)</label><input type="number" id="v_padrao" placeholder="Ex: 30"></div>
+                <div><label>Carreta Tanque</label><input type="number" id="v_tanque" placeholder="Ex: 15"></div>
+                <div><label>Carreta Baú</label><input type="number" id="v_bau" placeholder="Ex: 30"></div>
+                <div><label>Prancha</label><input type="number" id="v_prancha" placeholder="Ex: 10"></div>
+                <div><label>Graneleiro</label><input type="number" id="v_graneleiro" placeholder="Ex: 30"></div>
+            </div>
+            <button class="btn-apple" style="background-color: var(--success);" onclick="salvarValidades()">💾 Guardar Validades</button>
+        </div>
+
+        <div class="apple-card">
+            <h2 style="margin-top:0; font-size:18px;">Gestão em Massa (CSV)</h2>
+            <p style="font-size:13px; color:var(--text-muted); margin-bottom: 15px;">Importe novas perguntas ou extraia o banco de dados atual para o Excel.</p>
+            
+            <div class="spreadsheet-actions">
+                <button class="btn-sheet" onclick="exportarModeloCSV()">📥 Modelo CSV (Vazio)</button>
+                <button class="btn-sheet import" onclick="document.getElementById('inputCSV').click()">📤 Importar CSV</button>
+                <button class="btn-sheet export" onclick="exportarBancoCompleto()">📊 Extrair Banco Atual</button>
+                
+                <input type="file" id="inputCSV" style="display:none" accept=".csv" onchange="importarCSV(this)">
+            </div>
+        </div>
+
+        <div class="apple-card" id="formScrollTarget">
+            <h2 id="tituloFormPergunta" style="margin-top: 0; font-size: 18px;">➕ Adicionar Nova Pergunta</h2>
+            <div class="form-add">
+                <input type="hidden" id="edit_id_pergunta">
+
+                <label>Texto da Pergunta</label>
+                <input type="text" id="nova_pergunta" placeholder="Ex: Cintos de segurança em bom estado?">
+                
+                <div class="grid-validade">
+                    <div>
+                        <label>Categoria</label>
+                        <select id="nova_categoria" onchange="verificarCategoriaCarreta()">
+                            <option value="motorista">Motorista</option>
+                            <option value="cavalo">Cavalo Mecânico</option>
+                            <option value="carreta">Carreta</option>
+                        </select>
+                    </div>
+                    
+                    <div id="container_tipo_carreta" style="display: none;">
+                        <label>Exibir em qual tipo?</label>
+                        <select id="novo_tipo_carreta">
+                            <option value="todos">Todas as Carretas</option>
+                            <option value="tanque">Apenas Tanque</option>
+                            <option value="bau">Apenas Baú / Sider</option>
+                            <option value="prancha">Apenas Prancha</option>
+                            <option value="graneleiro">Apenas Graneleiro</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div>
+                        <strong style="display:block; font-size: 14px;">📸 Exigir Foto em caso de Falha?</strong>
+                        <span style="font-size: 12px; color: var(--text-muted);">Torna o envio de foto obrigatório se marcado "Falha".</span>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox" id="foto_obrigatoria" checked>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+
+                <div style="display: flex; gap: 10px;">
+                    <button id="btnCancelarEdicao" class="btn-apple-outline" style="flex: 1; display: none;" onclick="cancelarEdicao()">Cancelar</button>
+                    <button id="btnSalvarPergunta" class="btn-apple" style="flex: 2;" onclick="salvarPergunta()">Adicionar ao Banco</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="apple-card">
+            <h2 style="margin-top: 0; font-size: 18px;">📋 Banco de Perguntas</h2>
+            <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 15px;">Gerencie as perguntas que aparecem no aplicativo do operador.</p>
+            <div id="lista_perguntas_dinamica">
+                <p style="text-align: center; color: var(--text-muted);">A carregar banco de dados...</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="menu.js"></script>
+
+    <script>
+        const token = localStorage.getItem('pb_token');
+        if (!token) { window.location.href = 'login.html'; }
+
+        const POCKETBASE_URL = 'https://be8-be8-backend.i6qanl.easypanel.host';
+        const TABELA_VALIDADE = 'site_checklist_config_validade';
+        const TABELA_PERGUNTAS = 'site_checklist_banco_perguntas';
+        const cabecalhosAuth = { 
+            'Authorization': 'Bearer ' + token,
+            'Content-Type': 'application/json'
+        };
+
+        // ==========================================
+        // 1. DINÂMICA DO FORMULÁRIO (Exibir opções de Carreta)
+        // ==========================================
+        function verificarCategoriaCarreta() {
+            const categoria = document.getElementById('nova_categoria').value;
+            const containerCarreta = document.getElementById('container_tipo_carreta');
+            
+            if (categoria === 'carreta') {
+                containerCarreta.style.display = 'block';
+            } else {
+                containerCarreta.style.display = 'none';
+                document.getElementById('novo_tipo_carreta').value = 'todos'; 
+            }
+        }
+
+        // ==========================================
+        // 2. GESTÃO DAS VALIDADES
+        // ==========================================
+        async function carregarValidades() {
+            try {
+                const res = await fetch(`${POCKETBASE_URL}/api/collections/${TABELA_VALIDADE}/records?perPage=1`, { headers: cabecalhosAuth });
+                const data = await res.json();
+                if (data.items && data.items.length > 0) {
+                    const config = data.items[0];
+                    document.getElementById('id_validade').value = config.id;
+                    document.getElementById('v_cavalo').value = config.dias_cavalo || '';
+                    document.getElementById('v_padrao').value = config.dias_carreta || '';
+                    document.getElementById('v_tanque').value = config.dias_tanque || '';
+                    document.getElementById('v_bau').value = config.dias_bau || '';
+                    document.getElementById('v_prancha').value = config.dias_prancha || '';
+                    document.getElementById('v_graneleiro').value = config.dias_graneleiro || '';
+                }
+            } catch(e) { console.error("Erro validades", e); }
+        }
+
+        async function salvarValidades() {
+            const idRegistro = document.getElementById('id_validade').value;
+            const payload = {
+                dias_cavalo: parseInt(document.getElementById('v_cavalo').value) || 30,
+                dias_carreta: parseInt(document.getElementById('v_padrao').value) || 30,
+                dias_tanque: parseInt(document.getElementById('v_tanque').value) || 30,
+                dias_bau: parseInt(document.getElementById('v_bau').value) || 30,
+                dias_prancha: parseInt(document.getElementById('v_prancha').value) || 30,
+                dias_graneleiro: parseInt(document.getElementById('v_graneleiro').value) || 30,
+            };
+
+            try {
+                const metodo = idRegistro ? 'PATCH' : 'POST';
+                const url = idRegistro 
+                    ? `${POCKETBASE_URL}/api/collections/${TABELA_VALIDADE}/records/${idRegistro}`
+                    : `${POCKETBASE_URL}/api/collections/${TABELA_VALIDADE}/records`;
+
+                const res = await fetch(url, { method: metodo, headers: cabecalhosAuth, body: JSON.stringify(payload) });
+                if (res.ok) {
+                    alert("✅ Validades atualizadas!");
+                    carregarValidades();
+                } else alert("🚨 Erro ao guardar validades.");
+            } catch(e) { alert("Erro de ligação."); }
+        }
+
+        // ==========================================
+        // 3. IMPORTAÇÃO E EXPORTAÇÃO CSV
+        // ==========================================
+        function exportarModeloCSV() {
+            const colunas = "pergunta,categoria,tipo_carreta,ativo,foto_obrigatoria,ordem\n";
+            const exemplo = "O motorista esta com EPI completo?,motorista,todos,true,true,1\nExtintor de incendio na validade e lacrado?,cavalo,todos,true,true,2\nValvulas do tanque sem vazamento?,carreta,tanque,true,true,3\n";
+            
+            const blob = new Blob([colunas + exemplo], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement("a");
+            link.href = URL.createObjectURL(blob);
+            link.download = "modelo_perguntas_ssma.csv";
+            link.click();
+        }
+
+        async function exportarBancoCompleto() {
+            try {
+                const res = await fetch(`${POCKETBASE_URL}/api/collections/${TABELA_PERGUNTAS}/records?perPage=500&sort=categoria,ordem`, { headers: cabecalhosAuth });
+                const data = await res.json();
+                
+                if (!data.items || data.items.length === 0) {
+                    alert("O banco está vazio!");
+                    return;
+                }
+
+                let csv = "pergunta,categoria,tipo_carreta,ativo,foto_obrigatoria,ordem\n";
+                data.items.forEach(p => {
+                    // Substitui quebras de linha e envolve a pergunta em aspas para evitar que vírgulas quebrem o CSV
+                    const perguntaSegura = p.pergunta.replace(/"/g, '""').replace(/\n/g, ' '); 
+                    csv += `"${perguntaSegura}","${p.categoria}","${p.tipo_carreta}",${p.ativo},${p.foto_obrigatoria},${p.ordem}\n`;
+                });
+
+                const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+                const link = document.createElement("a");
+                link.href = URL.createObjectURL(blob);
+                link.download = "banco_completo_perguntas_ssma.csv";
+                link.click();
+            } catch(e) { alert("Erro ao extrair banco."); }
+        }
+
+        async function importarCSV(input) {
+            const file = input.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = async (e) => {
+                const linhas = e.target.result.split('\n');
+                
+                // Processa a partir da segunda linha (pula o cabeçalho)
+                for (let i = 1; i < linhas.length; i++) {
+                    if(!linhas[i].trim()) continue; 
+                    
+                    // Regex para lidar com vírgulas dentro de aspas no CSV
+                    const dados = linhas[i].match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g) || [];
+                    if (dados.length < 5) continue;
+
+                    const perguntaLimpa = dados[0].replace(/^"|"$/g, '').trim();
+
+                    const payload = {
+                        pergunta: perguntaLimpa,
+                        categoria: dados[1].replace(/^"|"$/g, '').trim(),
+                        tipo_carreta: dados[2].replace(/^"|"$/g, '').trim() || 'todos',
+                        ativo: dados[3].replace(/^"|"$/g, '').trim().toLowerCase() === 'true',
+                        foto_obrigatoria: dados[4].replace(/^"|"$/g, '').trim().toLowerCase() === 'true',
+                        ordem: parseInt(dados[5] || '99')
+                    };
+
+                    await fetch(`${POCKETBASE_URL}/api/collections/${TABELA_PERGUNTAS}/records`, {
+                        method: 'POST', headers: cabecalhosAuth, body: JSON.stringify(payload)
+                    });
+                }
+                alert("✅ Importação de perguntas concluída com sucesso!");
+                input.value = ""; 
+                carregarPerguntas(); 
+            };
+            reader.readAsText(file);
+        }
+
+        // ==========================================
+        // 4. GESTÃO DO BANCO DE PERGUNTAS (Lista, Editar, Deletar)
+        // ==========================================
+        let listaPerguntasGlobal = [];
+
+        async function carregarPerguntas() {
+            try {
+                const res = await fetch(`${POCKETBASE_URL}/api/collections/${TABELA_PERGUNTAS}/records?perPage=500&sort=categoria,ordem`, { headers: cabecalhosAuth });
+                const data = await res.json();
+                const container = document.getElementById('lista_perguntas_dinamica');
+                container.innerHTML = '';
+
+                if (data.items && data.items.length > 0) {
+                    listaPerguntasGlobal = data.items; 
+                    
+                    data.items.forEach(p => {
+                        let badgeClass = 'badge-mot';
+                        if (p.categoria === 'cavalo') badgeClass = 'badge-cav';
+                        if (p.categoria === 'carreta') badgeClass = 'badge-car';
+
+                        const reqFotoHTML = p.foto_obrigatoria 
+                            ? `<span class="badge badge-foto">📸 Foto Obrigatória</span>` 
+                            : '';
+
+                        const itemHTML = `
+                            <div class="pergunta-item">
+                                <div style="flex: 1;">
+                                    <div class="pergunta-texto">${p.pergunta}</div>
+                                    <div class="pergunta-badges">
+                                        <span class="badge ${badgeClass}">${p.categoria}</span>
+                                        ${p.categoria === 'carreta' ? `<span class="badge" style="background:var(--border); color:var(--text);">Filtro: ${p.tipo_carreta}</span>` : ''}
+                                        ${reqFotoHTML}
+                                    </div>
+                                </div>
+                                <div class="action-btns">
+                                    <label class="switch" style="margin-bottom: 5px;">
+                                        <input type="checkbox" ${p.ativo ? 'checked' : ''} onchange="alterarStatusPergunta('${p.id}', this.checked)">
+                                        <span class="slider"></span>
+                                    </label>
+                                    <div style="display:flex; gap: 5px;">
+                                        <button class="btn-icon edit" onclick="editarPergunta('${p.id}')">✏️ Editar</button>
+                                        <button class="btn-icon delete" onclick="excluirPergunta('${p.id}')">🗑️ Apagar</button>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                        container.innerHTML += itemHTML;
+                    });
+                } else {
+                    container.innerHTML = '<p style="text-align: center; color: var(--text-muted);">Nenhuma pergunta cadastrada.</p>';
+                }
+            } catch(e) { console.error("Erro ao carregar perguntas", e); }
+        }
+
+        async function salvarPergunta() {
+            const idEdit = document.getElementById('edit_id_pergunta').value;
+            const texto = document.getElementById('nova_pergunta').value;
+            const categoria = document.getElementById('nova_categoria').value;
+            const tipo = document.getElementById('novo_tipo_carreta').value;
+            const fotoReq = document.getElementById('foto_obrigatoria').checked;
+
+            if(!texto) { alert("Escreva o texto da pergunta!"); return; }
+
+            const payload = {
+                pergunta: texto,
+                categoria: categoria,
+                tipo_carreta: categoria === 'carreta' ? tipo : 'todos',
+                foto_obrigatoria: fotoReq,
+                ativo: true,
+                ordem: 99
+            };
+
+            try {
+                const metodo = idEdit ? 'PATCH' : 'POST';
+                const url = idEdit 
+                    ? `${POCKETBASE_URL}/api/collections/${TABELA_PERGUNTAS}/records/${idEdit}`
+                    : `${POCKETBASE_URL}/api/collections/${TABELA_PERGUNTAS}/records`;
+
+                const res = await fetch(url, { method: metodo, headers: cabecalhosAuth, body: JSON.stringify(payload) });
+
+                if (res.ok) {
+                    cancelarEdicao(); 
+                    carregarPerguntas();
+                } else alert("🚨 Erro ao processar pergunta.");
+            } catch(e) { alert("Erro de ligação."); }
+        }
+
+        async function alterarStatusPergunta(id, statusAtual) {
+            try {
+                await fetch(`${POCKETBASE_URL}/api/collections/${TABELA_PERGUNTAS}/records/${id}`, {
+                    method: 'PATCH',
+                    headers: cabecalhosAuth,
+                    body: JSON.stringify({ ativo: statusAtual })
+                });
+            } catch(e) { alert("Erro ao atualizar o status no banco."); carregarPerguntas(); }
+        }
+
+        // ==========================================
+        // 5. EDIÇÃO E EXCLUSÃO
+        // ==========================================
+        function editarPergunta(id) {
+            const pergunta = listaPerguntasGlobal.find(p => p.id === id);
+            if(!pergunta) return;
+
+            document.getElementById('edit_id_pergunta').value = pergunta.id;
+            document.getElementById('nova_pergunta').value = pergunta.pergunta;
+            document.getElementById('nova_categoria').value = pergunta.categoria;
+            verificarCategoriaCarreta(); 
+            if (pergunta.categoria === 'carreta') {
+                document.getElementById('novo_tipo_carreta').value = pergunta.tipo_carreta || 'todos';
+            }
+            document.getElementById('foto_obrigatoria').checked = pergunta.foto_obrigatoria;
+
+            document.getElementById('tituloFormPergunta').innerText = "✏️ Editar Pergunta";
+            document.getElementById('btnSalvarPergunta').innerText = "Guardar Alterações";
+            document.getElementById('btnSalvarPergunta').style.backgroundColor = "var(--warning)";
+            document.getElementById('btnSalvarPergunta').style.color = "#000";
+            document.getElementById('btnCancelarEdicao').style.display = "block";
+
+            document.getElementById('formScrollTarget').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function cancelarEdicao() {
+            document.getElementById('edit_id_pergunta').value = '';
+            document.getElementById('nova_pergunta').value = '';
+            document.getElementById('nova_categoria').value = 'motorista';
+            verificarCategoriaCarreta();
+            document.getElementById('foto_obrigatoria').checked = true;
+
+            document.getElementById('tituloFormPergunta').innerText = "➕ Adicionar Nova Pergunta";
+            document.getElementById('btnSalvarPergunta').innerText = "Adicionar ao Banco";
+            document.getElementById('btnSalvarPergunta').style.backgroundColor = "var(--accent)";
+            document.getElementById('btnSalvarPergunta').style.color = "#fff";
+            document.getElementById('btnCancelarEdicao').style.display = "none";
+        }
+
+        async function excluirPergunta(id) {
+            if(confirm("Tem certeza que deseja APAGAR esta pergunta? Esta ação não pode ser desfeita.")) {
+                try {
+                    const res = await fetch(`${POCKETBASE_URL}/api/collections/${TABELA_PERGUNTAS}/records/${id}`, {
+                        method: 'DELETE',
+                        headers: cabecalhosAuth
+                    });
+                    if (res.ok) {
+                        carregarPerguntas();
+                    } else alert("Erro ao tentar apagar a pergunta.");
+                } catch(e) { alert("Erro de ligação com o servidor."); }
+            }
+        }
+
+        // Inicializa a página
+        carregarValidades();
+        carregarPerguntas();
+        verificarCategoriaCarreta(); 
+    </script>
+</body>
+</html>

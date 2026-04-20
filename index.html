@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Dashboard - SpiderWorks Be8 Go</title>
+    <style>
+        :root { 
+            --bg: #f4f4f9; --card: #ffffff; --text: #1c1c1e; --text-muted: #8e8e93; 
+            --border: #e5e5ea; --accent: #007aff; --success: #34c759; --danger: #ff3b30; --warning: #ffcc00;
+        }
+        body.force-dark { 
+            --bg: #000000; --card: #1c1c1e; --text: #f2f2f7; --text-muted: #98989d; 
+            --border: #38383a; --accent: #0a84ff; --success: #32d74b; --danger: #ff453a; --warning: #ffd60a;
+        }
+
+        body { 
+            background-color: var(--bg); color: var(--text); 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; 
+            margin: 0; padding: 0; padding-bottom: 80px; 
+            background-image: radial-gradient(var(--border) 1px, transparent 1px);
+            background-size: 20px 20px; background-attachment: fixed;
+        }
+
+        .container { max-width: 1000px; margin: 40px auto; padding: 0 20px; }
+
+        .welcome-header { margin-bottom: 30px; display: flex; justify-content: space-between; align-items: flex-end;}
+        .welcome-header h1 { margin: 0; font-size: 28px; font-weight: 700; letter-spacing: -0.5px;}
+        .welcome-header p { margin: 5px 0 0; color: var(--text-muted); font-size: 15px; }
+
+        .card { background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 25px; box-shadow: 0 4px 20px rgba(0,0,0,0.03); }
+        .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .card-title { margin: 0; font-size: 16px; font-weight: 600; color: var(--text); }
+        .card-link { color: var(--accent); font-size: 13px; text-decoration: none; font-weight: 600; }
+
+        .kpi-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 25px; }
+        .kpi-card { display: flex; align-items: center; gap: 15px; padding: 20px; border-radius: 16px; background: var(--card); border: 1px solid var(--border); box-shadow: 0 4px 15px rgba(0,0,0,0.02);}
+        .kpi-icon { width: 48px; height: 48px; border-radius: 12px; display: flex; justify-content: center; align-items: center; font-size: 22px; flex-shrink: 0;}
+        .kpi-text h4 { margin: 0 0 4px 0; font-size: 12px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600;}
+        .kpi-text span { font-size: 24px; font-weight: 700; color: var(--text); line-height: 1;}
+
+        .bottom-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 25px; }
+
+        .table-container { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; text-align: left; }
+        th { padding: 12px 15px; border-bottom: 1px solid var(--border); color: var(--text-muted); font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px;}
+        td { padding: 15px; border-bottom: 1px solid var(--border); font-size: 14px; color: var(--text); font-weight: 500;}
+        tr:last-child td { border-bottom: none; }
+        
+        .status-badge { padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 700; display: inline-block; text-align: center;}
+        .status-badge.aprovado { background: rgba(52, 199, 89, 0.15); color: var(--success); }
+        .status-badge.reprovado { background: rgba(255, 59, 48, 0.15); color: var(--danger); }
+
+        .chart-container { display: flex; align-items: flex-end; gap: 10px; height: 150px; padding-top: 20px; border-bottom: 1px dashed var(--border);}
+        .chart-bar { flex: 1; background: var(--accent); border-radius: 6px 6px 0 0; position: relative; opacity: 0.8; transition: opacity 0.2s; cursor: pointer; min-height: 5px;}
+        .chart-bar:hover { opacity: 1; }
+        .chart-bar::after { content: attr(data-val); position: absolute; top: -25px; left: 50%; transform: translateX(-50%); font-size: 11px; font-weight: 600; color: var(--text-muted); }
+        .chart-labels { display: flex; justify-content: space-between; margin-top: 10px; padding: 0 5px;}
+        .chart-labels span { font-size: 11px; color: var(--text-muted); font-weight: 500; text-align: center; flex: 1;}
+
+        .operador-view { display: none; flex-direction: column; align-items: center; justify-content: center; margin-top: 50px; }
+        .op-card { background: var(--card); border: 1px solid var(--border); border-radius: 24px; padding: 40px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.05); max-width: 400px; width: 100%;}
+        .op-icon { font-size: 60px; margin-bottom: 20px; }
+        .op-title { font-size: 22px; font-weight: 700; margin-bottom: 10px; }
+        .op-desc { font-size: 14px; color: var(--text-muted); margin-bottom: 30px; line-height: 1.5;}
+        .btn-op { display: block; width: 100%; background: var(--accent); color: white; padding: 16px; border-radius: 12px; font-size: 16px; font-weight: 600; text-decoration: none; transition: 0.2s; box-sizing: border-box;}
+        .btn-op:active { transform: scale(0.98); opacity: 0.9; }
+
+        .ssma-view { display: none; } 
+
+        @media (max-width: 800px) {
+            .kpi-row { grid-template-columns: 1fr; gap: 15px;}
+            .bottom-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div id="menu-container"></div> 
+
+    <div class="container">
+        
+        <div class="welcome-header">
+            <div>
+                <h1 id="welcomeText">A carregar...</h1>
+                <p id="subText">A preparar o seu ambiente.</p>
+            </div>
+            <div id="dataHoje" style="font-size: 14px; font-weight: 600; color: var(--text-muted); text-align: right;"></div>
+        </div>
+
+        <div class="ssma-view" id="viewSSMA">
+            
+            <div class="kpi-row">
+                <div class="kpi-card">
+                    <div class="kpi-icon" style="background: rgba(0, 122, 255, 0.1); color: var(--accent);">🛡️</div>
+                    <div class="kpi-text"><h4>Conformidade</h4><span id="kpi-conf">--%</span></div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-icon" style="background: rgba(52, 199, 89, 0.1); color: var(--success);">✅</div>
+                    <div class="kpi-text"><h4>Aprovados (Hoje)</h4><span id="kpi-aprov">--</span></div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-icon" style="background: rgba(255, 59, 48, 0.1); color: var(--danger);">⚠️</div>
+                    <div class="kpi-text"><h4>Reprovados (Hoje)</h4><span id="kpi-reprov">--</span></div>
+                </div>
+            </div>
+
+            <div class="bottom-grid">
+                
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Últimas Inspeções Registadas</h3>
+                        <a href="historico.html" class="card-link">Ver Histórico Completo &rarr;</a>
+                    </div>
+                    <div class="table-container">
+                        <table>
+                            <thead><tr><th>Data/Hora</th><th>Placa</th><th>Motorista</th><th>Status</th></tr></thead>
+                            <tbody id="tabela-ultimos">
+                                <tr><td colspan="4" style="text-align: center; color: var(--text-muted);">A carregar dados...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Volume (Últimos 5 dias)</h3>
+                    </div>
+                    <div class="chart-container" id="chart-bars">
+                        </div>
+                    <div class="chart-labels" id="chart-labels">
+                        </div>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="operador-view" id="viewOperador">
+            <div class="op-card">
+                <div class="op-icon">📋</div>
+                <div class="op-title">Novo Checklist</div>
+                <div class="op-desc">Avalie o Motorista, o Cavalo Mecânico e a Carreta antes da liberação da próxima viagem.</div>
+                <a href="operador.html" class="btn-op">Iniciar Inspeção Agora</a>
+            </div>
+        </div>
+
+    </div>
+
+    <script src="menu.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", async function() {
+            // Data no topo
+            const opcoesData = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            document.getElementById('dataHoje').innerText = new Date().toLocaleDateString('pt-BR', opcoesData);
+
+            const token = localStorage.getItem('pb_token');
+            if (!token) { window.location.href = 'login.html'; return; }
+
+            const POCKETBASE_URL = 'https://be8-be8-backend.i6qanl.easypanel.host';
+            const cabecalhosAuth = { 'Authorization': 'Bearer ' + token };
+
+            let perfil = "OPERADOR";
+            let nome = "";
+
+            try {
+                // Recupera perfil
+                const res = await fetch(`${POCKETBASE_URL}/api/collections/users_checklist_portal/auth-refresh`, { method: 'POST', headers: cabecalhosAuth });
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data && data.record) {
+                        localStorage.setItem('pocketbase_auth', JSON.stringify({ model: data.record }));
+                        perfil = (data.record.perfil || "OPERADOR").toUpperCase();
+                        nome = data.record.nome || "";
+                    }
+                } else {
+                    const authRaw = localStorage.getItem('pocketbase_auth') || '{}';
+                    if(authRaw.includes("SSMA")) perfil = "SSMA";
+                }
+            } catch(e) { console.error("Erro:", e); }
+
+            const isSSMA = (perfil === 'SSMA' || perfil === 'ADMIN');
+            
+            if (!isSSMA) {
+                document.getElementById('welcomeText').innerText = "Olá, Operador!";
+                document.getElementById('subText').innerText = "O seu painel de inspeções.";
+                document.getElementById('viewOperador').style.display = 'flex';
+            } else {
+                const nomeExibicao = nome ? nome : "Equipe SSMA";
+                document.getElementById('welcomeText').innerText = `Olá, ${nomeExibicao}!`;
+                document.getElementById('subText').innerText = "Resumo da operação e saúde da frota.";
+                document.getElementById('viewSSMA').style.display = 'block';
+                
+                // Carregar Dados Reais para o SSMA
+                carregarDadosDashboard(POCKETBASE_URL, cabecalhosAuth);
+            }
+        });
+
+        async function carregarDadosDashboard(url, headers) {
+            try {
+                // Busca os últimos 500 registos para fazer as contas
+                const res = await fetch(`${url}/api/collections/site_checklist_registros/records?sort=-created&perPage=500&expand=motorista_id,cavalo_id`, { headers });
+                const data = await res.json();
+                
+                if(!data.items) return;
+                const registos = data.items;
+
+                // 1. Cálculos de Hoje
+                const hojeStr = new Date().toISOString().split('T')[0]; // "2026-04-20"
+                let aprovadosHoje = 0;
+                let reprovadosHoje = 0;
+                let totalAprovadosHist = 0;
+
+                registos.forEach(r => {
+                    const dataRegisto = r.created.split(' ')[0]; // Pega só a data
+                    if(dataRegisto === hojeStr) {
+                        if(r.status_final === 'Aprovado') aprovadosHoje++;
+                        else reprovadosHoje++;
+                    }
+                    if(r.status_final === 'Aprovado') totalAprovadosHist++;
+                });
+
+                document.getElementById('kpi-aprov').innerText = aprovadosHoje;
+                document.getElementById('kpi-reprov').innerText = reprovadosHoje;
+
+                // 2. Taxa de Conformidade
+                if(registos.length > 0) {
+                    const taxa = (totalAprovadosHist / registos.length) * 100;
+                    document.getElementById('kpi-conf').innerText = taxa.toFixed(1) + '%';
+                } else {
+                    document.getElementById('kpi-conf').innerText = '0%';
+                }
+
+                // 3. Preencher a Tabela (Últimos 5)
+                const tabela = document.getElementById('tabela-ultimos');
+                tabela.innerHTML = '';
+                const ultimos5 = registos.slice(0, 5);
+                
+                if(ultimos5.length === 0) {
+                    tabela.innerHTML = '<tr><td colspan="4" style="text-align: center;">Nenhum registo encontrado.</td></tr>';
+                } else {
+                    ultimos5.forEach(r => {
+                        const dataC = new Date(r.created);
+                        // Verifica se é hoje para formatar a data
+                        const isHoje = dataC.toISOString().split('T')[0] === hojeStr;
+                        const dataStr = isHoje 
+                            ? `Hoje, ${dataC.toLocaleTimeString('pt-BR', {hour:'2-digit', minute:'2-digit'})}`
+                            : dataC.toLocaleDateString('pt-BR', {day:'2-digit', month:'2-digit'}) + ' ' + dataC.toLocaleTimeString('pt-BR', {hour:'2-digit', minute:'2-digit'});
+                        
+                        const placa = r.expand?.cavalo_id?.placa || 'N/A';
+                        const mot = r.expand?.motorista_id?.nome || 'N/A';
+                        const badgeStatus = r.status_final === 'Aprovado' ? 'aprovado' : 'reprovado';
+
+                        tabela.innerHTML += `
+                            <tr>
+                                <td>${dataStr}</td>
+                                <td style="font-weight:bold;">${placa}</td>
+                                <td>${mot}</td>
+                                <td><span class="status-badge ${badgeStatus}">${r.status_final}</span></td>
+                            </tr>
+                        `;
+                    });
+                }
+
+                // 4. Gráfico dos Últimos 5 Dias
+                desenharGrafico(registos);
+
+            } catch(e) {
+                console.error("Erro ao carregar dados do dashboard:", e);
+                document.getElementById('tabela-ultimos').innerHTML = '<tr><td colspan="4" style="text-align: center; color:var(--danger);">Erro de ligação ao servidor.</td></tr>';
+            }
+        }
+
+        function desenharGrafico(registos) {
+            // Cria um array com os últimos 5 dias
+            const diasArray = [];
+            const contagens = [0, 0, 0, 0, 0];
+            const nomesDias = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
+            const labels = [];
+
+            const hoje = new Date();
+            
+            for(let i = 4; i >= 0; i--) {
+                const d = new Date(hoje);
+                d.setDate(d.getDate() - i);
+                diasArray.push(d.toISOString().split('T')[0]);
+                
+                if(i === 0) labels.push('Hoje');
+                else labels.push(nomesDias[d.getDay()]);
+            }
+
+            // Conta os registos para cada dia
+            registos.forEach(r => {
+                const dataReg = r.created.split(' ')[0];
+                const index = diasArray.indexOf(dataReg);
+                if(index !== -1) contagens[index]++;
+            });
+
+            // Encontra o maior valor para definir a altura de 100%
+            let maxVal = Math.max(...contagens);
+            if(maxVal === 0) maxVal = 1; // Evita divisão por zero
+
+            const chartBars = document.getElementById('chart-bars');
+            const chartLabels = document.getElementById('chart-labels');
+            chartBars.innerHTML = '';
+            chartLabels.innerHTML = '';
+
+            // Desenha as barras e os textos
+            for(let i = 0; i < 5; i++) {
+                const alturaPercent = (contagens[i] / maxVal) * 100;
+                // Garante um mínimo de altura visual
+                const alturaCss = alturaPercent < 5 ? 5 : alturaPercent;
+
+                chartBars.innerHTML += `<div class="chart-bar" style="height: ${alturaCss}%;" data-val="${contagens[i]}"></div>`;
+                chartLabels.innerHTML += `<span>${labels[i]}</span>`;
+            }
+        }
+    </script>
+</body>
+</html>

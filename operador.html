@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Be8 Go - Novo Checklist</title>
+    <link rel="stylesheet" href="style-apple.css">
+    <style>
+        .step { display: none; }
+        .step.active { display: block; animation: fadeIn 0.3s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        .wizard-header { position: sticky; top: 60px; background: var(--bg); padding: 15px 0; z-index: 10; margin-bottom: 20px;}
+        .progress-bar { height: 8px; background: var(--border); border-radius: 4px; overflow: hidden; }
+        .progress-fill { height: 100%; background: var(--accent); width: 20%; transition: width 0.4s ease; }
+        
+        input[type="text"], select, textarea { width: 100%; padding: 14px; margin-bottom: 20px; border-radius: 10px; border: 1px solid var(--border); background: var(--card); color: var(--text); font-size: 16px; box-sizing: border-box; }
+        
+        .guide-img-container { width: 100%; margin-bottom: 20px; border-radius: 12px; overflow: hidden; border: 1px solid var(--border); background: #f5f5f7; text-align: center; }
+        .guide-img-container img { width: 100%; max-height: 220px; object-fit: cover; display: block; }
+        
+        .question-block { border-bottom: 1px solid var(--border); padding-bottom: 20px; margin-bottom: 20px; }
+        .question-block:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+        
+        .question-title { font-weight: 600; margin-bottom: 15px; font-size: 15px; display: flex; align-items: flex-start; gap: 8px; line-height: 1.4; }
+        .question-title span { background: var(--accent); color: white; width: 24px; height: 24px; display: inline-flex; align-items: center; justify-content: center; border-radius: 50%; font-size: 13px; flex-shrink: 0; margin-top: -2px; }
+        
+        .options-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+        .options-grid label { text-align: center; padding: 12px 2px; border: 2px solid var(--border); border-radius: 10px; font-weight: 700; font-size: 12px; cursor: pointer; transition: all 0.2s; word-break: break-word; }
+        .options-grid input[type="radio"] { display: none; }
+        
+        input[value="sim"]:checked + label { background-color: rgba(52, 199, 89, 0.1); border-color: var(--success); color: var(--success); }
+        input[value="nao"]:checked + label { background-color: rgba(255, 149, 0, 0.1); border-color: #ff9500; color: #ff9500; }
+        input[value="falha"]:checked + label { background-color: rgba(255, 59, 48, 0.1); border-color: var(--danger); color: var(--danger); }
+        input[value="na"]:checked + label { background-color: rgba(134, 134, 139, 0.1); border-color: var(--text-muted); color: var(--text-muted); }
+
+        .evidence-area { display: none; margin-top: 15px; padding-top: 15px; border-top: 1px dashed var(--border); animation: fadeIn 0.3s ease; }
+        .btn-camera { display: block; width: 100%; background: var(--border); color: var(--text); text-align: center; padding: 14px; border-radius: 10px; font-weight: 600; cursor: pointer; box-sizing: border-box; }
+        .btn-camera input[type="file"] { display: none; }
+
+        .btn-nav-group { display: flex; gap: 10px; margin-top: 20px; }
+        .btn-voltar { background: #e0e0e0; color: #333; flex: 0.3; }
+        .btn-avancar { flex: 0.7; }
+        
+        .loading-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.9); z-index: 9999; justify-content: center; align-items: center; flex-direction: column; }
+        .spinner { border: 4px solid #f3f3f3; border-top: 4px solid var(--accent); border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin-bottom: 15px;}
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+    <div id="menu-container"></div>
+    
+    <div class="loading-overlay" id="loadingScreen">
+        <div class="spinner"></div>
+        <h3 id="loadingText" style="color: var(--text); font-weight: 600;">A carregar banco de dados...</h3>
+    </div>
+
+    <div class="container" style="max-width: 800px;">
+        <div class="wizard-header">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                <span id="stepName" style="font-size:14px; font-weight:600; color:var(--accent);">Etapa 1: Triagem</span>
+            </div>
+            <div class="progress-bar"><div class="progress-fill" id="pFill" style="width: 16%;"></div></div>
+        </div>
+
+        <div class="step active" id="step1">
+            <div class="apple-card">
+                <h2 style="margin-top: 0;">Dados da Viagem</h2>
+                <label>Transportadora (Digite para buscar)</label>
+                <input type="text" id="iptTransp" list="listaTransp" placeholder="Ex: Jordano" onchange="loadAssets()" autocomplete="off">
+                <datalist id="listaTransp"></datalist>
+                
+                <label>Motorista (Digite para buscar)</label>
+                <input type="text" id="iptMot" list="listaMot" placeholder="Nome do motorista..." autocomplete="off">
+                <datalist id="listaMot"></datalist>
+                
+                <label>Placa do Cavalo Mecânico</label>
+                <input type="text" id="iptVei" list="listaVei" placeholder="Ex: ABC1234" autocomplete="off">
+                <datalist id="listaVei"></datalist>
+            </div>
+            <button class="btn-apple" style="width: 100%" onclick="nextStep(2, 'Inspeção: Motorista')">Continuar para Motorista</button>
+        </div>
+
+        <div class="step" id="step2">
+            <div class="apple-card">
+                <h2 style="margin-top: 0;">Inspeção: Motorista</h2>
+                <div class="guide-img-container">
+                    <img src="https://placehold.co/800x200/e0e0e0/5a5a5a?text=Guia+Visual:+Documentos+e+EPIs" alt="Guia Motorista">
+                </div>
+                <div id="containerPerguntasMotorista"></div>
+            </div>
+            <div class="btn-nav-group">
+                <button class="btn-apple btn-voltar" onclick="prevStep(1, 'Triagem')">Voltar</button>
+                <button class="btn-apple btn-avancar" onclick="nextStep(3, 'Inspeção: Cavalo')">Avançar: Cavalo</button>
+            </div>
+        </div>
+
+        <div class="step" id="step3">
+            <div class="apple-card">
+                <h2 style="margin-top: 0;">Inspeção: Cavalo Mecânico</h2>
+                <div class="guide-img-container">
+                    <img src="https://placehold.co/800x200/e0e0e0/5a5a5a?text=Guia+Visual:+Inspecao+Veicular" alt="Guia Cavalo">
+                </div>
+                <div id="containerPerguntasCavalo"></div>
+            </div>
+            <div class="apple-card">
+                <h3>Este veículo possui Carreta acoplada?</h3>
+                <div style="display: flex; gap: 10px; margin-top: 15px;">
+                    <button class="btn-apple" style="flex: 1;" onclick="nextStep(4, 'Dados da Carreta')">Sim, Possui</button>
+                    <button class="btn-apple-outline" style="flex: 1; border-color: var(--success); color: var(--success);" onclick="salvarNoBanco()">Não, Finalizar</button>
+                </div>
+            </div>
+            <div class="btn-nav-group">
+                <button class="btn-apple btn-voltar" style="flex: 1;" onclick="prevStep(2, 'Inspeção: Motorista')">Voltar ao Motorista</button>
+            </div>
+        </div>
+
+        <div class="step" id="step4">
+            <div class="apple-card">
+                <h2 style="margin-top: 0;">Identificação da Carreta</h2>
+                <label>Placa da Carreta (Digite para buscar)</label>
+                <input type="text" id="iptCarreta" list="listaCarreta" placeholder="Ex: XYZ9876" autocomplete="off">
+                <datalist id="listaCarreta"></datalist>
+
+                <label>Tipo da Carreta</label>
+                <select id="tipoCarreta" onchange="renderizarPerguntasCarreta()">
+                    <option value="padrao">Padrão Geral</option>
+                    <option value="tanque">Tanque (Líquidos/Químicos)</option>
+                    <option value="bau">Sider / Baú</option>
+                    <option value="prancha">Prancha (Carga Pesada)</option>
+                </select>
+                <p style="font-size: 13px; color: var(--text-muted); margin-top: 10px;">O tipo selecionado filtrará as perguntas da próxima etapa.</p>
+            </div>
+            <div class="btn-nav-group">
+                <button class="btn-apple btn-voltar" onclick="prevStep(3, 'Inspeção: Cavalo')">Voltar</button>
+                <button class="btn-apple btn-avancar" onclick="nextStep(5, 'Inspeção: Carreta')">Avançar: Carreta</button>
+            </div>
+        </div>
+
+        <div class="step" id="step5">
+            <div class="apple-card">
+                <h2 style="margin-top: 0;">Inspeção: Carreta</h2>
+                <div class="guide-img-container">
+                    <img src="https://placehold.co/800x200/e0e0e0/5a5a5a?text=Guia+Visual:+Engate+e+Carreta" alt="Guia Carreta">
+                </div>
+                <div id="containerPerguntasCarreta"></div>
+            </div>
+            <div class="btn-nav-group">
+                <button class="btn-apple btn-voltar" onclick="prevStep(4, 'Dados da Carreta')">Voltar</button>
+                <button class="btn-apple btn-avancar" style="background-color: var(--success);" onclick="salvarNoBanco()">Gravar no Banco de Dados</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="menu.js"></script>
+    <script>
+        const token = localStorage.getItem('pb_token');
+        if (!token) { window.location.href = 'login.html'; }
+
+        // Mapeamentos e Configurações
+        let mapas = { transportadoras: {}, motoristas: {}, cavalos: {}, carretas: {} };
+        const POCKETBASE_URL = 'https://be8-be8-backend.i6qanl.easypanel.host';
+        const cabecalhosAuth = { 'Authorization': 'Bearer ' + token };
+
+        // BANCO DE DADOS DINÂMICO (Preenchido via API)
+        let questoesMotorista = [];
+        let questoesCavalo = [];
+        let questoesCarreta = [];
+        let configuracoesSSMA = { diasValidadeCavalo: 30, diasValidadeCarreta: { padrao: 30, tanque: 15, bau: 30, prancha: 10, graneleiro: 30 } };
+
+        // ==========================================
+        // 1. CARREGAR PERGUNTAS DO POCKETBASE
+        // ==========================================
+        async function carregarConfiguracoesEPerguntas() {
+            document.getElementById('loadingScreen').style.display = 'flex';
+            
+            try {
+                // 1. Carregar Validades
+                const resVal = await fetch(`${POCKETBASE_URL}/api/collections/site_checklist_config_validade/records?perPage=1`, { headers: cabecalhosAuth });
+                const dataVal = await resVal.json();
+                if (dataVal.items && dataVal.items.length > 0) {
+                    const v = dataVal.items[0];
+                    configuracoesSSMA.diasValidadeCavalo = v.dias_cavalo || 30;
+                    configuracoesSSMA.diasValidadeCarreta = { padrao: v.dias_padrao||30, tanque: v.dias_tanque||15, bau: v.dias_bau||30, prancha: v.dias_prancha||10, graneleiro: v.dias_graneleiro||30 };
+                }
+
+                // 2. Carregar Perguntas (Apenas as ATIVAS, ordenadas)
+                const resPerg = await fetch(`${POCKETBASE_URL}/api/collections/site_checklist_banco_perguntas/records?perPage=500&filter=(ativo=true)&sort=ordem`, { headers: cabecalhosAuth });
+                const dataPerg = await resPerg.json();
+
+                if (dataPerg.items) {
+                    dataPerg.items.forEach(p => {
+                        const q = { id: p.id, texto: p.pergunta, tipo: p.tipo_carreta || 'todos', fotoReq: p.foto_obrigatoria };
+                        if(p.categoria === 'motorista') questoesMotorista.push(q);
+                        else if(p.categoria === 'cavalo') questoesCavalo.push(q);
+                        else if(p.categoria === 'carreta') questoesCarreta.push(q);
+                    });
+                }
+                
+                renderizarTodasAsPerguntas();
+                document.getElementById('loadingScreen').style.display = 'none';
+            } catch(e) {
+                console.error(e);
+                alert("Erro ao conectar com o banco de dados das perguntas.");
+                document.getElementById('loadingScreen').style.display = 'none';
+            }
+        }
+
+        // ==========================================
+        // 2. RENDERIZAÇÃO HTML DINÂMICA
+        // ==========================================
+        function gerarHTMLPergunta(pergunta, numero) {
+            const nameRadio = `r_${pergunta.id}`;
+            const idEvidencia = `ev_${pergunta.id}`;
+            const labelFoto = pergunta.fotoReq ? "📷 Anexar Foto (Obrigatória)" : "📷 Anexar Foto (Opcional)";
+
+            return `
+            <div class="question-block" id="block_${pergunta.id}">
+                <div class="question-title"><span>${numero}</span> ${pergunta.texto}</div>
+                <div class="options-grid">
+                    <input type="radio" name="${nameRadio}" id="${pergunta.id}-sim" value="sim"><label for="${pergunta.id}-sim">SIM</label>
+                    <input type="radio" name="${nameRadio}" id="${pergunta.id}-nao" value="nao"><label for="${pergunta.id}-nao">NÃO</label>
+                    <input type="radio" name="${nameRadio}" id="${pergunta.id}-falha" value="falha" onchange="mostrarEvidencia('${idEvidencia}', this)"><label for="${pergunta.id}-falha">FALHA</label>
+                    <input type="radio" name="${nameRadio}" id="${pergunta.id}-na" value="na"><label for="${pergunta.id}-na">N/A</label>
+                </div>
+                <div class="evidence-area" id="${idEvidencia}">
+                    <textarea class="obs-input" id="obs_${pergunta.id}" placeholder="Descreva a falha / avaria encontrada..."></textarea>
+                    <label class="btn-camera">${labelFoto} <input type="file" id="foto_${pergunta.id}" class="file-input" accept="image/*" capture="environment"></label>
+                </div>
+            </div>`;
+        }
+
+        function renderizarTodasAsPerguntas() {
+            document.getElementById('containerPerguntasMotorista').innerHTML = questoesMotorista.map((q, i) => gerarHTMLPergunta(q, i+1)).join('');
+            document.getElementById('containerPerguntasCavalo').innerHTML = questoesCavalo.map((q, i) => gerarHTMLPergunta(q, i+1)).join('');
+            renderizarPerguntasCarreta(); 
+        }
+
+        function renderizarPerguntasCarreta() {
+            const tipoEscolhido = document.getElementById('tipoCarreta').value;
+            const filtradas = questoesCarreta.filter(q => q.tipo === 'todos' || q.tipo === tipoEscolhido);
+            document.getElementById('containerPerguntasCarreta').innerHTML = filtradas.map((q, i) => gerarHTMLPergunta(q, i+1)).join('');
+        }
+
+        function mostrarEvidencia(idEvidencia, elementoRadio) {
+            const container = document.getElementById(idEvidencia);
+            const radios = document.getElementsByName(elementoRadio.name);
+            radios.forEach(r => { r.addEventListener('change', function() { container.style.display = this.value === 'falha' ? 'block' : 'none'; }); });
+            container.style.display = 'block';
+        }
+
+        // ==========================================
+        // 3. CARREGAR TRANSPORTADORAS E FROTAS
+        // ==========================================
+        async function initApp() {
+            await carregarConfiguracoesEPerguntas(); // Busca as perguntas primeiro
+            try {
+                const res = await fetch(`${POCKETBASE_URL}/api/collections/transportadoras/records?perPage=100`, { headers: cabecalhosAuth });
+                const data = await res.json();
+                const datalist = document.getElementById('listaTransp');
+                if (data.items) {
+                    data.items.forEach(t => { 
+                        const nome = t.razao_social || t.nome_fantasia || 'Empresa sem nome';
+                        mapas.transportadoras[nome] = t.id; 
+                        datalist.innerHTML += `<option value="${nome}">`; 
+                    });
+                }
+            } catch(e) { console.error("Erro transportadoras:", e); }
+        }
+
+        async function loadAssets() {
+            const nomeDigitado = document.getElementById('iptTransp').value;
+            const transpId = mapas.transportadoras[nomeDigitado]; 
+            
+            document.getElementById('listaMot').innerHTML = ''; document.getElementById('listaVei').innerHTML = ''; document.getElementById('listaCarreta').innerHTML = '';
+            mapas.motoristas = {}; mapas.cavalos = {}; mapas.carretas = {};
+
+            if(!transpId) return; 
+            
+            try {
+                const filtroRelacao = encodeURIComponent(`transportadora_id='${transpId}'`);
+                const resMot = await fetch(`${POCKETBASE_URL}/api/collections/motoristas/records?filter=${filtroRelacao}&perPage=100`, { headers: cabecalhosAuth });
+                const dataMot = await resMot.json();
+                if (dataMot.items) { dataMot.items.forEach(m => { mapas.motoristas[m.nome] = m.id; document.getElementById('listaMot').innerHTML += `<option value="${m.nome}">`; }); }
+                
+                const resVei = await fetch(`${POCKETBASE_URL}/api/collections/veiculos/records?filter=${filtroRelacao}&perPage=500`, { headers: cabecalhosAuth });
+                const dataVei = await resVei.json();
+                if (dataVei.items) {
+                    dataVei.items.forEach(v => {
+                        mapas.cavalos[v.placa] = v.id; mapas.carretas[v.placa] = v.id; 
+                        document.getElementById('listaVei').innerHTML += `<option value="${v.placa}">`; document.getElementById('listaCarreta').innerHTML += `<option value="${v.placa}">`;
+                    });
+                }
+            } catch (e) { console.error("Erro frotas:", e); }
+        }
+
+        // ==========================================
+        // 4. FUNÇÕES DE UTILIDADE E NAVEGAÇÃO
+        // ==========================================
+        function calcularDataValidade(diasAdicionais) {
+            const data = new Date(); data.setDate(data.getDate() + diasAdicionais); return data.toISOString();
+        }
+
+        function obterIdDoOperadorLogado() {
+            try { const base64Url = token.split('.')[1]; const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+                const jsonPayload = decodeURIComponent(window.atob(base64).split('').map(function(c) { return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2); }).join(''));
+                return JSON.parse(jsonPayload).id;
+            } catch(e) { return null; }
+        }
+
+        function nextStep(num, title) { document.querySelectorAll('.step').forEach(el => el.classList.remove('active')); document.getElementById('step' + num).classList.add('active'); document.getElementById('stepName').innerText = `Etapa ${num}: ${title}`; document.getElementById('pFill').style.width = ((num / 5) * 100) + '%'; window.scrollTo(0, 0); }
+        function prevStep(num, title) { nextStep(num, title); }
+
+        // ==========================================
+        // 5. SALVAR NO BANCO DE DADOS
+        // ==========================================
+        async function salvarNoBanco() {
+            const idTransp = mapas.transportadoras[document.getElementById('iptTransp').value];
+            const idMot    = mapas.motoristas[document.getElementById('iptMot').value];
+            const idCavalo = mapas.cavalos[document.getElementById('iptVei').value];
+            const idCarreta = mapas.carretas[document.getElementById('iptCarreta').value]; 
+            const idOperador = obterIdDoOperadorLogado();
+
+            if(!idTransp || !idMot || !idCavalo) { alert("⚠️ Selecione Transportadora, Motorista e Placa da lista."); return; }
+            if(!idOperador) { alert("🚨 Sessão expirada. Faça login novamente."); return; }
+
+            document.getElementById('loadingText').innerText = "A gravar registo...";
+            document.getElementById('loadingScreen').style.display = 'flex';
+
+            let statusGeral = "Aprovado";
+            const respostasObj = { motorista: {}, cavalo: {}, carreta: {} };
+            let observacoes = [];
+            const formData = new FormData();
+
+            // Avalia todas as respostas dinâmicas
+            const todasAsQuestoes = [ ...questoesMotorista.map(q => ({...q, cat: 'motorista'})), ...questoesCavalo.map(q => ({...q, cat: 'cavalo'})), ...questoesCarreta.map(q => ({...q, cat: 'carreta'})) ];
+
+            todasAsQuestoes.forEach(q => {
+                const radioSelecionado = document.querySelector(`input[name="r_${q.id}"]:checked`);
+                if(radioSelecionado) {
+                    respostasObj[q.cat][q.id] = radioSelecionado.value;
+                    if(radioSelecionado.value === 'falha') {
+                        statusGeral = "Reprovado";
+                        const textoObs = document.getElementById(`obs_${q.id}`)?.value || '';
+                        if(textoObs) observacoes.push(`(Item ${q.texto}) ${textoObs}`);
+                        
+                        const inputArq = document.getElementById(`foto_${q.id}`);
+                        if(inputArq && inputArq.files[0]) formData.append('fotos_evidencias', inputArq.files[0]);
+                    }
+                }
+            });
+
+            formData.append('validade_cavalo', calcularDataValidade(configuracoesSSMA.diasValidadeCavalo));
+            if(idCarreta) {
+                const tipoSelecionado = document.getElementById('tipoCarreta').value;
+                const dias = configuracoesSSMA.diasValidadeCarreta[tipoSelecionado] || 30;
+                formData.append('validade_carreta', calcularDataValidade(dias));
+            }
+
+            formData.append('operador_id', idOperador); 
+            formData.append('transportadora_id', idTransp);
+            formData.append('motorista_id', idMot);
+            formData.append('cavalo_id', idCavalo);
+            if(idCarreta) formData.append('carreta_id', idCarreta);
+            
+            formData.append('respostas_json', JSON.stringify(respostasObj));
+            formData.append('status_final', statusGeral);
+            formData.append('observacoes_avarias', observacoes.join(' | '));
+
+            try {
+                const req = await fetch(`${POCKETBASE_URL}/api/collections/site_checklist_registros/records`, { method: 'POST', headers: cabecalhosAuth, body: formData });
+                if (req.ok) {
+                    alert("✅ Checklist gravado com sucesso no banco de dados!");
+                    window.location.reload(); 
+                } else {
+                    const err = await req.json(); alert("🚨 Erro ao salvar: \n" + JSON.stringify(err));
+                    document.getElementById('loadingScreen').style.display = 'none';
+                }
+            } catch(e) {
+                alert("🚨 Erro de conexão."); document.getElementById('loadingScreen').style.display = 'none';
+            }
+        }
+
+        initApp();
+    </script>
+</body>
+</html>

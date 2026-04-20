@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Manual do Utilizador - SpiderWorks Be8 Go</title>
+    <style>
+        :root { 
+            --bg: #f4f4f9; --card: #ffffff; --text: #1c1c1e; --text-muted: #8e8e93; 
+            --border: #e5e5ea; --accent: #007aff; --success: #34c759; --danger: #ff3b30; --warning: #ffcc00;
+        }
+        body.force-dark { 
+            --bg: #000000; --card: #1c1c1e; --text: #f2f2f7; --text-muted: #98989d; 
+            --border: #38383a; --accent: #0a84ff; --success: #32d74b; --danger: #ff453a;
+        }
+
+        body { 
+            background-color: var(--bg); color: var(--text); 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; 
+            margin: 0; padding: 0; padding-bottom: 80px; line-height: 1.6;
+        }
+
+        .container { max-width: 800px; margin: 40px auto; padding: 0 20px; }
+
+        .page-header { margin-bottom: 40px; border-bottom: 2px solid var(--border); padding-bottom: 20px;}
+        .page-header h1 { font-size: 32px; margin: 0 0 10px 0; font-weight: 800; letter-spacing: -0.5px;}
+        .page-header p { color: var(--text-muted); font-size: 16px; margin: 0; }
+
+        .manual-section { margin-bottom: 50px; background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.02);}
+        .manual-section h2 { border-bottom: 1px solid var(--border); padding-bottom: 15px; margin-top: 0; margin-bottom: 25px; font-size: 22px; display: flex; align-items: center; gap: 10px;}
+        
+        .badge-ssma { background: rgba(88, 86, 214, 0.1); color: #5856d6; font-size: 11px; padding: 4px 10px; border-radius: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; border: 1px solid rgba(88, 86, 214, 0.2); margin-left: auto;}
+
+        .step-box { display: flex; gap: 20px; align-items: flex-start; margin-bottom: 25px; }
+        .step-box:last-child { margin-bottom: 0; }
+        .step-num { background: var(--accent); color: white; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; flex-shrink: 0; font-size: 15px; box-shadow: 0 4px 10px rgba(0, 122, 255, 0.3);}
+        .step-content h3 { margin: 0 0 8px 0; font-size: 16px; }
+        .step-content p { margin: 0; color: var(--text); font-size: 14.5px; }
+
+        .info-panel { background: rgba(0, 122, 255, 0.05); border-left: 4px solid var(--accent); padding: 15px 20px; border-radius: 0 12px 12px 0; margin: 20px 0; font-size: 14px; }
+        .warning-panel { background: rgba(255, 59, 48, 0.05); border-left: 4px solid var(--danger); padding: 15px 20px; border-radius: 0 12px 12px 0; margin: 20px 0; font-size: 14px; }
+
+        ul { margin: 10px 0; padding-left: 20px; }
+        li { margin-bottom: 5px; }
+
+    </style>
+</head>
+<body>
+    <div id="menu-container"></div>
+    
+    <main class="container">
+        <div class="page-header">
+            <h1>📖 Manual do Sistema</h1>
+            <p>Guia completo de operação, gestão e configuração do Portal de Checklist SSMA.</p>
+        </div>
+
+        <div class="info-panel" style="margin-bottom: 40px;">
+            <strong>ℹ️ Perfis de Acesso:</strong> O sistema adapta-se a quem faz o login. <strong>Operadores</strong> têm acesso exclusivo à criação de novos checklists. A equipa de <strong>SSMA / Administração</strong> tem acesso total ao Histórico, Dashboard e Configurações.
+        </div>
+
+        <section class="manual-section">
+            <h2>📱 1. Execução do Checklist (Operador)</h2>
+            <p style="margin-bottom: 20px; font-size: 15px; color: var(--text-muted);">O coração do sistema. O formulário é dinâmico e guia o operador passo a passo para garantir que nenhuma etapa de segurança é esquecida.</p>
+            
+            <div class="step-box">
+                <div class="step-num">1</div>
+                <div class="step-content">
+                    <h3>Triagem Inteligente</h3>
+                    <p>Ao iniciar um "Novo Checklist", o primeiro passo é selecionar a <strong>Transportadora</strong>. O sistema está interligado ao banco de dados: ao escolher a empresa, as listas de Motoristas e Veículos são filtradas automaticamente, mostrando apenas as opções pertencentes àquela transportadora, evitando erros de digitação.</p>
+                </div>
+            </div>
+
+            <div class="step-box">
+                <div class="step-num">2</div>
+                <div class="step-content">
+                    <h3>Inspeção Dinâmica</h3>
+                    <p>O checklist é dividido em etapas lógicas: <strong>Motorista &rarr; Cavalo Mecânico &rarr; Carreta</strong>. As perguntas não são fixas; elas são carregadas diretamente do servidor no momento do acesso. Se o Gestor SSMA adicionar uma nova regra hoje, ela aparecerá automaticamente no tablet do operador amanhã.</p>
+                </div>
+            </div>
+
+            <div class="step-box">
+                <div class="step-num" style="background: var(--warning); color: #000;">3</div>
+                <div class="step-content">
+                    <h3>Registo de Avarias e Fotografias</h3>
+                    <p>As respostas possíveis são: SIM, NÃO, FALHA ou N/A. O sistema tem uma trava de segurança embutida:</p>
+                    <div class="warning-panel" style="margin-top: 10px;">
+                        Se um item for marcado como <strong>FALHA</strong>, o sistema expande imediatamente um painel exigindo duas ações:
+                        <ul>
+                            <li><strong>Observação:</strong> Um texto descrevendo o problema encontrado.</li>
+                            <li><strong>Evidência Fotográfica:</strong> Anexar uma foto (que pode abrir a câmara do telemóvel diretamente) para comprovar a avaria. O Gestor SSMA pode definir na configuração se esta foto é obrigatória ou opcional.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="step-box">
+                <div class="step-num">4</div>
+                <div class="step-content">
+                    <h3>O Filtro de Carretas</h3>
+                    <p>Ao finalizar o Cavalo, o operador indica se existe carreta acoplada. Em caso afirmativo, ele seleciona o <strong>Tipo de Carreta</strong> (Ex: Tanque, Sider/Baú, Prancha). O sistema adapta-se instantaneamente, exibindo apenas as perguntas relevantes para aquele tipo específico de implemento rodoviário.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="manual-section">
+            <h2>
+                <span>📊 2. Histórico e Relatórios</span>
+                <span class="badge-ssma">Apenas SSMA</span>
+            </h2>
+            <p style="margin-bottom: 20px; font-size: 15px; color: var(--text-muted);">A central de auditoria. Onde os gestores avaliam a saúde da frota e extraem documentos oficiais.</p>
+
+            <div class="step-box">
+                <div class="step-num">1</div>
+                <div class="step-content">
+                    <h3>Dashboard Executivo</h3>
+                    <p>Ao aceder ao painel (Início), o SSMA tem acesso imediato aos KPIs diários: Taxa de Conformidade global, e o número de veículos Aprovados e Reprovados no dia atual, além de um gráfico de volume semanal.</p>
+                </div>
+            </div>
+
+            <div class="step-box">
+                <div class="step-num">2</div>
+                <div class="step-content">
+                    <h3>Filtros de Pesquisa Rápidos</h3>
+                    <p>Na página "Histórico", é possível filtrar centenas de registos em segundos. Use o menu suspenso para isolar uma Transportadora específica, ou a barra de pesquisa para digitar diretamente a Placa do veículo ou o Nome do motorista que deseja encontrar.</p>
+                </div>
+            </div>
+
+            <div class="step-box">
+                <div class="step-num">3</div>
+                <div class="step-content">
+                    <h3>Auditoria Detalhada (Pop-up)</h3>
+                    <p>Ao clicar em <strong>"Detalhes"</strong> num registo, abre-se uma janela sobreposta que exibe 100% das respostas dadas pelo operador. Se houve reprovação, a observação digitada e a miniatura da fotografia estarão disponíveis para visualização e ampliação em ecrã inteiro.</p>
+                </div>
+            </div>
+
+            <div class="step-box">
+                <div class="step-num" style="background: var(--danger);">4</div>
+                <div class="step-content">
+                    <h3>Geração de PDF Oficial</h3>
+                    <p>Cada registo possui um botão <strong>"Gerar PDF"</strong>. Com um clique, o sistema compila os dados da viagem, as datas de validade, a tabela de conformidade de todas as respostas e as fotografias anexadas num documento PDF profissional, pronto a ser impresso, arquivado ou enviado em caso de fiscalização.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="manual-section">
+            <h2>
+                <span>⚙️ 3. Painel de Configuração SSMA</span>
+                <span class="badge-ssma">Apenas SSMA</span>
+            </h2>
+            <p style="margin-bottom: 20px; font-size: 15px; color: var(--text-muted);">A "casa das máquinas". Onde as regras de negócio e as perguntas do checklist são governadas.</p>
+
+            <div class="step-box">
+                <div class="step-num">1</div>
+                <div class="step-content">
+                    <h3>Controlo de Prazos de Validade</h3>
+                    <p>O sistema permite definir quantos dias um checklist é válido, diferenciando os veículos. Pode-se estipular que a validade de um Cavalo Mecânico é de 30 dias, mas a de uma Carreta Tanque (produtos perigosos) seja de apenas 15 dias. O sistema calcula automaticamente o vencimento no momento da gravação do registo.</p>
+                </div>
+            </div>
+
+            <div class="step-box">
+                <div class="step-num">2</div>
+                <div class="step-content">
+                    <h3>Gestão de Perguntas (Interface)</h3>
+                    <p>Na lista inferior do painel, o gestor pode ver todas as perguntas ativas. É possível ligar/desligar uma pergunta (interruptor lateral) caso ela deixe de ser obrigatória temporariamente. Também existem botões para <strong>Editar</strong> (corrigir erros ortográficos) ou <strong>Apagar</strong> definitivamente uma questão.</p>
+                </div>
+            </div>
+
+            <div class="step-box">
+                <div class="step-num">3</div>
+                <div class="step-content">
+                    <h3>Criação de Novas Regras</h3>
+                    <p>Ao adicionar uma nova pergunta, deve-se definir:</p>
+                    <ul>
+                        <li><strong>Categoria:</strong> Se pertence ao Motorista, Cavalo ou Carreta.</li>
+                        <li><strong>Filtro Específico:</strong> Se for da Carreta, define-se se a pergunta aparece para "Todas" ou apenas para um tipo (Ex: "Válvulas lacradas" apenas para Carreta Tanque).</li>
+                        <li><strong>Obrigatoriedade de Foto:</strong> Define se, ao falhar este item, o operador é <i>obrigado</i> a tirar foto para prosseguir.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="step-box">
+                <div class="step-num" style="background: var(--success);">4</div>
+                <div class="step-content">
+                    <h3>Gestão em Massa (Importação CSV)</h3>
+                    <p>Para não ter de digitar dezenas de perguntas manualmente, o sistema suporta ficheiros Excel (CSV). </p>
+                    <ul>
+                        <li><strong>Extrair Banco:</strong> O botão azul gera um ficheiro Excel com todas as perguntas atuais para backup.</li>
+                        <li><strong>Importar CSV:</strong> O botão verde permite subir um ficheiro (como o <code>carga.csv</code>) contendo todas as perguntas de uma só vez, populando o banco de dados e enviando-as instantaneamente para os tablets dos operadores.</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <script src="menu.js"></script>
+</body>
+</html>
