@@ -1,392 +1,279 @@
-/* ================================================== */
-/* VARIÁVEIS DE TEMA (MODO CLARO E ESCURO)            */
-/* ================================================== */
-
-/* Variáveis Iniciais (Light Mode) */
-:root {
-    --accent: #007AFF;
-    --bg: #F5F5F7;
-    --card: #FFFFFF;
-    --text: #1D1D1F;
-    --text-muted: #86868b;
-    --border: rgba(0, 0, 0, 0.1);
-    --success: #34C759;
-    --danger: #FF3B30;
+/* =========================================================
+   1. VARIÁVEIS GLOBAIS E TEMA BASE (Padrão iOS)
+   ========================================================= */
+:root { 
+    --bg: #f4f4f9; 
+    --card: #ffffff; 
+    --text: #1c1c1e; 
+    --text-muted: #8e8e93; 
+    --border: #e5e5ea; 
+    --accent: #007aff; 
+    --success: #34c759; 
+    --danger: #ff3b30; 
+    --warning: #ffcc00;
 }
 
-/* Modo Escuro (Dark Mode) */
-[data-theme="dark"] {
-    --bg: #000000;
-    --card: #1C1C1E;
-    --text: #F5F5F7;
-    --text-muted: #98989d;
-    --border: rgba(255, 255, 255, 0.1);
+body.force-dark { 
+    --bg: #000000; 
+    --card: #1c1c1e; 
+    --text: #f2f2f7; 
+    --text-muted: #98989d; 
+    --border: #38383a; 
+    --accent: #0a84ff; 
+    --success: #32d74b;
 }
 
-/* ================================================== */
-/* RESET E ESTILOS GLOBAIS                            */
-/* ================================================== */
-
-body {
-    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, sans-serif;
-    background-color: var(--bg);
-    color: var(--text);
-    margin: 0;
-    padding-bottom: 80px; /* Espaço para o rodapé não sobrepor conteúdo */
-    transition: background-color 0.3s, color 0.3s;
+body { 
+    background-color: var(--bg); 
+    color: var(--text); 
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; 
+    margin: 0; 
+    padding: 0; 
+    padding-bottom: 80px; 
+    background-image: radial-gradient(var(--border) 1px, transparent 1px);
+    background-size: 20px 20px; 
+    background-attachment: fixed;
 }
 
-/* ================================================== */
-/* BARRA DE NAVEGAÇÃO (APPLE NAV GLASSMORPHISM)       */
-/* ================================================== */
-
-.apple-nav {
-    background-color: rgba(255, 255, 255, 0.72);
-    backdrop-filter: saturate(180%) blur(20px);
-    -webkit-backdrop-filter: saturate(180%) blur(20px);
-    border-bottom: 1px solid var(--border);
-    position: sticky;
-    top: 0;
-    z-index: 1000;
-    transition: background-color 0.3s;
+.container { 
+    max-width: 800px; 
+    margin: 40px auto; 
+    padding: 0 20px; 
 }
 
-[data-theme="dark"] .apple-nav {
-    background-color: rgba(28, 28, 30, 0.72);
+/* =========================================================
+   2. COMPONENTES DE ESTRUTURA (Cards e Formulários)
+   ========================================================= */
+.card { 
+    background: var(--card); 
+    border: 1px solid var(--border); 
+    border-radius: 20px; 
+    padding: 25px; 
+    box-shadow: 0 4px 20px rgba(0,0,0,0.03); 
 }
 
-.nav-content {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 15px 30px;
-    max-width: 1200px;
-    margin: 0 auto;
+.card-header h2 { 
+    margin: 0 0 20px 0; 
+    font-size: 24px; 
+    font-weight: 700; 
 }
 
-.brand {
-    font-size: 18px;
-    color: var(--text);
-    text-decoration: none;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.nav-link {
-    color: var(--text);
-    text-decoration: none;
-    font-weight: 500;
-    margin: 0 15px;
-    font-size: 15px;
-    transition: color 0.2s;
-}
-
-.nav-link:hover { color: var(--accent); }
-
-.icon-btn {
-    background: transparent;
-    border: none;
-    font-size: 20px;
-    cursor: pointer;
-    color: var(--text);
-    margin-right: 15px;
-    transition: transform 0.2s;
-}
-
-.icon-btn:hover {
-    transform: scale(1.1);
-}
-
-.logout-btn {
-    color: var(--danger);
-    text-decoration: none;
-    font-weight: 600;
-    font-size: 15px;
-}
-
-/* ================================================== */
-/* CONTAINERS E CARDS PADRÃO                          */
-/* ================================================== */
-
-.container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 30px;
-}
-
-.apple-card {
-    background: var(--card);
-    border-radius: 18px;
-    padding: 25px;
-    border: 1px solid var(--border);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.03);
-    margin-bottom: 20px;
-}
-
-/* ================================================== */
-/* TABELAS                                            */
-/* ================================================== */
-
-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 15px;
-}
-
-th, td {
-    padding: 12px 15px;
-    text-align: left;
-    border-bottom: 1px solid var(--border);
-}
-
-th { 
-    color: var(--text-muted); 
-    font-weight: 600; 
+.step-indicator { 
+    color: var(--accent); 
     font-size: 14px; 
+    font-weight: 600; 
+    margin-bottom: 20px; 
+    display: block; 
+    border-bottom: 2px solid var(--accent); 
+    padding-bottom: 10px; 
+    width: fit-content; 
 }
 
-/* ================================================== */
-/* BOTÕES GLOBAIS                                     */
-/* ================================================== */
+.form-group { margin-bottom: 25px; }
 
-.btn-apple {
-    background: var(--accent);
-    color: white;
-    border: none;
-    padding: 12px 24px;
-    border-radius: 10px;
-    font-weight: 600;
-    font-size: 15px;
-    cursor: pointer;
-    transition: opacity 0.2s, transform 0.1s;
+.form-group label { 
+    display: block; 
+    margin-bottom: 8px; 
+    font-size: 14px; 
+    font-weight: 600; 
+    color: var(--text-muted); 
 }
 
-.btn-apple:hover { opacity: 0.8; }
-.btn-apple:active { transform: scale(0.98); }
+/* Botão Principal Padrão */
+.btn-primary { 
+    display: block; 
+    width: 100%; 
+    background: var(--accent); 
+    color: white; 
+    padding: 16px; 
+    border: none; 
+    border-radius: 12px; 
+    font-size: 16px; 
+    font-weight: 600; 
+    cursor: pointer; 
+    transition: 0.2s; 
+    box-sizing: border-box; 
+    margin-top: 30px;
+}
+.btn-primary:active { transform: scale(0.98); opacity: 0.9; }
 
-.btn-apple-outline {
-    background: transparent;
-    color: var(--accent);
-    border: 1px solid var(--accent);
-    padding: 12px 24px;
-    border-radius: 10px;
-    font-weight: 600;
-    font-size: 15px;
-    cursor: pointer;
-    transition: background-color 0.2s, transform 0.1s;
+
+/* =========================================================
+   3. BOTÃO SELETOR MOBILE (Falso Input)
+   ========================================================= */
+.mobile-select-btn {
+    width: 100%; 
+    background: var(--card); 
+    border: 1px solid var(--border);
+    padding: 16px; 
+    border-radius: 12px; 
+    font-size: 16px; 
+    color: var(--text);
+    text-align: left; 
+    display: flex; 
+    justify-content: space-between;
+    align-items: center; 
+    cursor: pointer; 
+    box-sizing: border-box; 
+    transition: all 0.2s;
 }
 
-.btn-apple-outline:hover { background-color: rgba(0, 122, 255, 0.1); }
-.btn-apple-outline:active { transform: scale(0.98); }
-
-/* ================================================== */
-/* RODAPÉ GLOBAL                                      */
-/* ================================================== */
-
-.apple-footer {
-    position: fixed;
-    bottom: 0;
-    width: 100%;
-    background: var(--card);
-    border-top: 1px solid var(--border);
-    padding: 15px 0;
-    text-align: center;
-    font-size: 13px;
-    color: var(--text-muted);
-    z-index: 999;
+.mobile-select-btn .btn-text { 
+    flex: 1; 
+    white-space: nowrap; 
+    overflow: hidden; 
+    text-overflow: ellipsis; 
+    color: var(--text-muted); 
 }
 
-.apple-footer a {
-    color: var(--accent);
-    text-decoration: none;
-    font-weight: 600;
+.mobile-select-btn.selecionado .btn-text { 
+    color: var(--text); 
+    font-weight: 600; 
 }
 
-/* ================================================== */
-/* DASHBOARD PREMIUM (SSMA)                           */
-/* ================================================== */
-
-.dashboard-header-premium {
-    display: flex;
-    gap: 20px;
-    margin-top: 10px;
+.mobile-select-btn.selecionado { 
+    border-color: var(--success); 
 }
 
-@media (max-width: 768px) {
-    .dashboard-header-premium { flex-direction: column; }
+/* Estado de Campo Bloqueado (Aguardando anterior) */
+.mobile-select-btn.disabled {
+    opacity: 0.5; 
+    background-color: var(--bg); 
+    cursor: not-allowed; 
+    pointer-events: none; 
+    border-style: dashed;
 }
 
-/* Card Gradiente Azul */
-.card-blue {
-    background: linear-gradient(135deg, #2E7CF6, #6D69F6);
-    color: white;
-    flex: 2;
-    border-radius: 20px;
-    padding: 30px 40px;
-    position: relative;
-    overflow: hidden;
-    box-shadow: 0 10px 20px rgba(46, 124, 246, 0.2);
+
+/* =========================================================
+   4. MODAL / BOTTOM SHEET (A Janela que sobe)
+   ========================================================= */
+.modal-overlay {
+    display: none; 
+    position: fixed; 
+    top: 0; left: 0; 
+    width: 100%; height: 100%;
+    background: rgba(0, 0, 0, 0.6); 
+    z-index: 9999; 
+    align-items: flex-end; /* Mobile: Cola no fundo */
+    backdrop-filter: blur(2px);
 }
 
-.card-blue h4 {
-    margin: 0;
-    font-size: 14px;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    opacity: 0.9;
-}
-
-.card-blue .big-number {
-    font-size: 72px;
-    font-weight: 800;
-    margin: 10px 0;
-    line-height: 1;
-}
-
-.card-blue p {
-    margin: 0;
-    font-size: 14px;
-    opacity: 0.8;
-    max-width: 80%;
-}
-
-.bg-wave {
-    position: absolute;
-    right: -50px;
-    bottom: -50px;
-    width: 300px;
-    height: 300px;
-    background: rgba(255,255,255,0.1);
-    border-radius: 50%;
-}
-
-/* Card Escuro com Anéis Apple Watch */
-.card-rings {
-    background: #1C1C1E;
-    color: white;
-    flex: 1;
-    border-radius: 20px;
-    padding: 30px;
-    display: flex;
+.modal-sheet {
+    background: var(--card); 
+    width: 100%; 
+    height: 85vh;
+    border-radius: 24px 24px 0 0; 
+    display: flex; 
     flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.card-rings h4 {
-    margin: 0 0 20px 0;
-    font-size: 14px;
-    font-weight: 600;
+@keyframes slideUp { 
+    from { transform: translateY(100%); } 
+    to { transform: translateY(0); } 
 }
 
-.activity-rings {
-    width: 140px;
-    height: 140px;
+.modal-header { 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+    padding: 20px 20px 15px; 
 }
 
-.activity-rings svg {
-    width: 100%;
-    height: 100%;
-    transform: rotate(-90deg);
+.modal-header h3 { 
+    margin: 0; 
+    font-size: 18px; 
+    font-weight: 700; 
 }
 
-.ring-bg { fill: none; stroke-width: 10; opacity: 0.2; }
-.ring-progress { fill: none; stroke-width: 10; stroke-linecap: round; }
-
-.ring-red { stroke: #FF3B30; }
-.ring-green { stroke: #34C759; }
-.ring-blue { stroke: #007AFF; }
-
-
-/* ================================================== */
-/* CALCULADORA MACOS (MODAL)                          */
-/* ================================================== */
-
-.calc-overlay {
-    display: none;
-    position: fixed;
-    top: 0; left: 0; width: 100%; height: 100%;
-    background: rgba(0, 0, 0, 0.4);
-    backdrop-filter: blur(5px);
-    -webkit-backdrop-filter: blur(5px);
-    z-index: 2000;
-    justify-content: center;
-    align-items: center;
-}
-
-.mac-calculator {
-    background: #333333;
-    width: 260px;
-    border-radius: 12px;
-    box-shadow: 0 20px 40px rgba(0,0,0,0.5);
-    overflow: hidden;
-    border: 1px solid #444;
-}
-
-.mac-titlebar {
-    height: 28px;
-    background: #333333;
-    display: flex;
-    align-items: center;
-    padding: 0 10px;
-    gap: 8px;
-}
-
-.mac-close, .mac-min, .mac-max { 
-    width: 12px; 
-    height: 12px; 
+.modal-close {
+    background: var(--bg); 
+    border: none; 
     border-radius: 50%; 
+    width: 36px; height: 36px;
+    font-size: 18px; 
+    cursor: pointer; 
+    color: var(--text-muted); 
+    display: flex; 
+    justify-content: center; 
+    align-items: center;
+}
+
+.modal-search { 
+    padding: 0 20px 15px; 
+    border-bottom: 1px solid var(--border); 
+}
+
+.modal-search input {
+    width: 100%; 
+    padding: 16px; 
+    border: 1px solid var(--border); 
+    border-radius: 12px;
+    font-size: 16px; 
+    box-sizing: border-box; 
+    background: var(--bg); 
+    color: var(--text); 
+    outline: none;
+}
+.modal-search input:focus {
+    border-color: var(--accent);
+}
+
+.modal-list { 
+    list-style: none; 
+    padding: 0; 
+    margin: 0; 
+    overflow-y: auto; 
+    flex: 1; 
+}
+
+.modal-list li {
+    padding: 20px; 
+    border-bottom: 1px solid var(--border); 
+    font-size: 16px;
+    color: var(--text); 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
     cursor: pointer;
 }
-.mac-close { background: #FF5F56; }
-.mac-min { background: #FFBD2E; }
-.mac-max { background: #27C93F; }
+.modal-list li:active { background-color: var(--bg); }
 
-.calc-display {
-    background: #333333;
-    color: white;
-    font-size: 46px;
-    font-weight: 300;
-    text-align: right;
-    padding: 10px 20px;
-    height: 60px;
-    display: flex;
-    align-items: flex-end;
-    justify-content: flex-end;
-    overflow: hidden;
+.modal-list li.selecionado { 
+    color: var(--success); 
+    font-weight: 700; 
+    background: rgba(52, 199, 89, 0.05); 
 }
 
-.calc-keys {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 1px;
-    background: #444;
+.modal-list li.selecionado::after { 
+    content: '✔'; 
+    font-size: 18px; 
 }
 
-.calc-btn {
-    background: #505050;
-    color: white;
-    border: none;
-    font-size: 20px;
-    padding: 15px 0;
-    cursor: pointer;
-    font-family: -apple-system, sans-serif;
-    transition: background 0.1s;
+.modal-empty { 
+    padding: 30px 20px; 
+    text-align: center; 
+    color: var(--text-muted); 
+    display: none; 
 }
 
-.calc-btn:active { background: #737373; }
-
-.btn-light { background: #D4D4D2; color: black; }
-.btn-light:active { background: #A5A5A5; }
-
-.btn-orange { background: #FF9500; color: white; font-weight: bold; font-size: 24px; }
-.btn-orange:active { background: #CC7700; }
-
-.zero-btn {
-    grid-column: span 2;
-    text-align: left;
-    padding-left: 25px;
+/* =========================================================
+   5. RESPONSIVIDADE (Ajuste para Web / Tablet / Desktop)
+   ========================================================= */
+@media (min-width: 768px) {
+    .modal-overlay { 
+        align-items: center; 
+        justify-content: center; 
+    }
+    .modal-sheet { 
+        width: 600px; 
+        height: 80vh; 
+        border-radius: 24px; 
+        animation: popIn 0.3s ease-out; 
+    }
+    @keyframes popIn { 
+        from { transform: scale(0.95); opacity: 0; } 
+        to { transform: scale(1); opacity: 1; } 
+    }
 }

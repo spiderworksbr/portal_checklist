@@ -10,11 +10,9 @@
         .step.active { display: block; animation: fadeIn 0.3s ease; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         
-        .wizard-header { position: sticky; top: 60px; background: var(--bg); padding: 15px 0; z-index: 10; margin-bottom: 20px;}
+        .wizard-header { position: sticky; top: 0; background: var(--bg); padding: 15px 0; z-index: 10; margin-bottom: 20px;}
         .progress-bar { height: 8px; background: var(--border); border-radius: 4px; overflow: hidden; }
         .progress-fill { height: 100%; background: var(--accent); width: 20%; transition: width 0.4s ease; }
-        
-        input[type="text"], select, textarea { width: 100%; padding: 14px; margin-bottom: 20px; border-radius: 10px; border: 1px solid var(--border); background: var(--card); color: var(--text); font-size: 16px; box-sizing: border-box; }
         
         .guide-img-container { width: 100%; margin-bottom: 20px; border-radius: 12px; overflow: hidden; border: 1px solid var(--border); background: #f5f5f7; text-align: center; }
         .guide-img-container img { width: 100%; max-height: 220px; object-fit: cover; display: block; }
@@ -22,11 +20,11 @@
         .question-block { border-bottom: 1px solid var(--border); padding-bottom: 20px; margin-bottom: 20px; }
         .question-block:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
         
-        .question-title { font-weight: 600; margin-bottom: 15px; font-size: 15px; display: flex; align-items: flex-start; gap: 8px; line-height: 1.4; }
+        .question-title { font-weight: 600; margin-bottom: 15px; font-size: 15px; display: flex; align-items: flex-start; gap: 8px; line-height: 1.4; color: var(--text); }
         .question-title span { background: var(--accent); color: white; width: 24px; height: 24px; display: inline-flex; align-items: center; justify-content: center; border-radius: 50%; font-size: 13px; flex-shrink: 0; margin-top: -2px; }
         
         .options-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
-        .options-grid label { text-align: center; padding: 12px 2px; border: 2px solid var(--border); border-radius: 10px; font-weight: 700; font-size: 12px; cursor: pointer; transition: all 0.2s; word-break: break-word; }
+        .options-grid label { text-align: center; padding: 12px 2px; border: 2px solid var(--border); border-radius: 10px; font-weight: 700; font-size: 12px; cursor: pointer; transition: all 0.2s; word-break: break-word; color: var(--text); }
         .options-grid input[type="radio"] { display: none; }
         
         input[value="sim"]:checked + label { background-color: rgba(52, 199, 89, 0.1); border-color: var(--success); color: var(--success); }
@@ -35,353 +33,330 @@
         input[value="na"]:checked + label { background-color: rgba(134, 134, 139, 0.1); border-color: var(--text-muted); color: var(--text-muted); }
 
         .evidence-area { display: none; margin-top: 15px; padding-top: 15px; border-top: 1px dashed var(--border); animation: fadeIn 0.3s ease; }
+        .evidence-area textarea { width: 100%; padding: 14px; margin-bottom: 10px; border-radius: 10px; border: 1px solid var(--border); background: var(--bg); color: var(--text); font-size: 14px; box-sizing: border-box; outline: none; }
         .btn-camera { display: block; width: 100%; background: var(--border); color: var(--text); text-align: center; padding: 14px; border-radius: 10px; font-weight: 600; cursor: pointer; box-sizing: border-box; }
         .btn-camera input[type="file"] { display: none; }
 
         .btn-nav-group { display: flex; gap: 10px; margin-top: 20px; }
-        .btn-voltar { background: #e0e0e0; color: #333; flex: 0.3; }
+        .btn-voltar { background: var(--border) !important; color: var(--text) !important; flex: 0.3; }
         .btn-avancar { flex: 0.7; }
         
         .loading-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.9); z-index: 9999; justify-content: center; align-items: center; flex-direction: column; }
         .spinner { border: 4px solid #f3f3f3; border-top: 4px solid var(--accent); border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin-bottom: 15px;}
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        .preview-container { display: flex; gap: 10px; margin-top: 10px; flex-wrap: wrap; }
+        .thumb-wrapper { position: relative; width: 65px; height: 65px; border-radius: 8px; overflow: hidden; border: 1px solid var(--border); box-shadow: 0 2px 5px rgba(0,0,0,0.1); animation: fadeIn 0.3s ease; }
+        .thumb-wrapper img { width: 100%; height: 100%; object-fit: cover; }
+        .btn-remove-thumb { position: absolute; top: 2px; right: 2px; background: rgba(255,59,48,0.9); color: white; border: none; border-radius: 50%; width: 22px; height: 22px; font-size: 10px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+        .btn-camera.limit-reached { opacity: 0.5; pointer-events: none; background: #e5e5ea; }
+
+        /* TELA DE SUCESSO GIGANTE */
+        .success-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg); z-index: 10000; flex-direction: column; justify-content: center; align-items: center; padding: 20px; box-sizing: border-box; text-align: center; animation: fadeIn 0.4s ease; }
+        .success-icon { font-size: 90px; margin-bottom: 20px; animation: popIn 0.5s cubic-bezier(0.16, 1, 0.3, 1); }
+        @keyframes popIn { 0% { transform: scale(0.5); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+        .success-title { font-size: 26px; font-weight: 800; color: var(--text); margin-bottom: 15px; letter-spacing: -0.5px; }
+        .success-message { font-size: 16px; color: var(--text-muted); margin-bottom: 40px; line-height: 1.5; max-width: 400px; }
+        .success-buttons { display: flex; flex-direction: column; gap: 15px; width: 100%; max-width: 400px; }
+        .btn-large { padding: 20px; font-size: 18px; border-radius: 16px; font-weight: 700; width: 100%; border: none; cursor: pointer; transition: 0.2s; }
+        .btn-large:active { transform: scale(0.98); opacity: 0.9; }
     </style>
 </head>
 <body>
-    <div id="menu-container"></div>
-    
-    <div class="loading-overlay" id="loadingScreen">
-        <div class="spinner"></div>
-        <h3 id="loadingText" style="color: var(--text); font-weight: 600;">A carregar banco de dados...</h3>
+
+    <div class="loading-overlay" id="loadingScreen"><div class="spinner"></div><h3 id="loadingText" style="color: var(--text); font-weight: 600;">A carregar...</h3></div>
+
+    <div class="success-overlay" id="successScreen">
+        <div class="success-icon" id="iconStatusChecklist">✅</div>
+        <div class="success-title" id="tituloStatusChecklist">Checklist Gravado!</div>
+        <div class="success-message">A inspeção foi enviada para o banco de dados. Deseja iniciar uma nova triagem agora?</div>
+        <div class="success-buttons">
+            <button class="btn-large" style="background-color: var(--accent); color: white;" onclick="window.location.reload()">Sim, Nova Inspeção</button>
+            <button class="btn-large" style="background-color: var(--border); color: var(--text);" onclick="window.location.href='index.html'">Não, Voltar ao Painel</button>
+        </div>
     </div>
 
-    <div class="container" style="max-width: 800px;">
+    <div class="container">
+        
         <div class="wizard-header">
             <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
                 <span id="stepName" style="font-size:14px; font-weight:600; color:var(--accent);">Etapa 1: Triagem</span>
             </div>
-            <div class="progress-bar"><div class="progress-fill" id="pFill" style="width: 16%;"></div></div>
+            <div class="progress-bar"><div class="progress-fill" id="pFill" style="width: 20%;"></div></div>
         </div>
 
         <div class="step active" id="step1">
-            <div class="apple-card">
+            <div class="card">
                 <h2 style="margin-top: 0;">Dados da Viagem</h2>
-                <label>Transportadora (Digite para buscar)</label>
-                <input type="text" id="iptTransp" list="listaTransp" placeholder="Ex: Jordano" onchange="loadAssets()" autocomplete="off">
-                <datalist id="listaTransp"></datalist>
-                
-                <label>Motorista (Digite para buscar)</label>
-                <input type="text" id="iptMot" list="listaMot" placeholder="Nome do motorista..." autocomplete="off">
-                <datalist id="listaMot"></datalist>
-                
-                <label>Placa do Cavalo Mecânico</label>
-                <input type="text" id="iptVei" list="listaVei" placeholder="Ex: ABC1234" autocomplete="off">
-                <datalist id="listaVei"></datalist>
+                <div class="form-group"><label>Transportadora</label><button type="button" class="mobile-select-btn" id="btn-transportadora" onclick="abrirSeletor('transportadora', 'Transportadora')"><span class="btn-text">A carregar...</span><span class="btn-icon">▼</span></button><input type="hidden" id="input-transportadora"></div>
+                <div class="form-group"><label>Motorista</label><button type="button" class="mobile-select-btn disabled" id="btn-motorista" onclick="abrirSeletor('motorista', 'Motorista')"><span class="btn-text">Aguardar transportadora...</span><span class="btn-icon">🔒</span></button><input type="hidden" id="input-motorista"></div>
+                <div class="form-group"><label>Placa do Cavalo</label><button type="button" class="mobile-select-btn disabled" id="btn-cavalo" onclick="abrirSeletor('cavalo', 'Cavalo')"><span class="btn-text">Aguardar transportadora...</span><span class="btn-icon">🔒</span></button><input type="hidden" id="input-cavalo"></div>
+                <div class="form-group"><label>Placa da Carreta (Opcional)</label><button type="button" class="mobile-select-btn disabled" id="btn-carreta" onclick="abrirSeletor('carreta', 'Carreta')"><span class="btn-text">Aguardar transportadora...</span><span class="btn-icon">🔒</span></button><input type="hidden" id="input-carreta"></div>
+                <button type="button" class="btn-primary" onclick="iniciarChecklist()">Continuar para Inspeção</button>
             </div>
-            <button class="btn-apple" style="width: 100%" onclick="nextStep(2, 'Inspeção: Motorista')">Continuar para Motorista</button>
         </div>
 
         <div class="step" id="step2">
-            <div class="apple-card">
-                <h2 style="margin-top: 0;">Inspeção: Motorista</h2>
-                <div class="guide-img-container">
-                    <img src="https://placehold.co/800x200/e0e0e0/5a5a5a?text=Guia+Visual:+Documentos+e+EPIs" alt="Guia Motorista">
-                </div>
-                <div id="containerPerguntasMotorista"></div>
-            </div>
-            <div class="btn-nav-group">
-                <button class="btn-apple btn-voltar" onclick="prevStep(1, 'Triagem')">Voltar</button>
-                <button class="btn-apple btn-avancar" onclick="nextStep(3, 'Inspeção: Cavalo')">Avançar: Cavalo</button>
-            </div>
+            <div class="card"><h2 style="margin-top:0;">Inspeção: Motorista</h2><div id="containerPerguntasMotorista"></div></div>
+            <div class="btn-nav-group"><button class="btn-primary btn-voltar" onclick="prevStep(1, 'Triagem')">Voltar</button><button class="btn-primary btn-avancar" onclick="nextStep(3, 'Inspeção: Cavalo')">Avançar: Cavalo</button></div>
         </div>
 
         <div class="step" id="step3">
-            <div class="apple-card">
-                <h2 style="margin-top: 0;">Inspeção: Cavalo Mecânico</h2>
-                <div class="guide-img-container">
-                    <img src="https://placehold.co/800x200/e0e0e0/5a5a5a?text=Guia+Visual:+Inspecao+Veicular" alt="Guia Cavalo">
-                </div>
-                <div id="containerPerguntasCavalo"></div>
-            </div>
-            <div class="apple-card">
-                <h3>Este veículo possui Carreta acoplada?</h3>
-                <div style="display: flex; gap: 10px; margin-top: 15px;">
-                    <button class="btn-apple" style="flex: 1;" onclick="nextStep(4, 'Dados da Carreta')">Sim, Possui</button>
-                    <button class="btn-apple-outline" style="flex: 1; border-color: var(--success); color: var(--success);" onclick="salvarNoBanco()">Não, Finalizar</button>
-                </div>
-            </div>
-            <div class="btn-nav-group">
-                <button class="btn-apple btn-voltar" style="flex: 1;" onclick="prevStep(2, 'Inspeção: Motorista')">Voltar ao Motorista</button>
-            </div>
+            <div class="card"><h2 style="margin-top:0;">Inspeção: Cavalo Mecânico</h2><div id="containerPerguntasCavalo"></div></div>
+            <div class="card" style="margin-top: 20px;"><h3 style="margin-top:0;">Próximo Passo</h3><div style="display: flex; gap: 10px; margin-top: 15px;"><button class="btn-primary" style="flex: 1;" onclick="decidirCaminhoCarreta()">Inspeção da Carreta</button><button class="btn-primary" style="flex: 1; background: transparent; border: 2px solid var(--success); color: var(--success);" onclick="salvarNoBanco()">Finalizar (Sem Carreta)</button></div></div>
+            <div class="btn-nav-group"><button class="btn-primary btn-voltar" style="flex: 1;" onclick="prevStep(2, 'Inspeção: Motorista')">Voltar ao Motorista</button></div>
         </div>
 
         <div class="step" id="step4">
-            <div class="apple-card">
-                <h2 style="margin-top: 0;">Identificação da Carreta</h2>
-                <label>Placa da Carreta (Digite para buscar)</label>
-                <input type="text" id="iptCarreta" list="listaCarreta" placeholder="Ex: XYZ9876" autocomplete="off">
-                <datalist id="listaCarreta"></datalist>
-
-                <label>Tipo da Carreta</label>
-                <select id="tipoCarreta" onchange="renderizarPerguntasCarreta()">
-                    <option value="padrao">Padrão Geral</option>
-                    <option value="tanque">Tanque (Líquidos/Químicos)</option>
-                    <option value="bau">Sider / Baú</option>
-                    <option value="prancha">Prancha (Carga Pesada)</option>
-                </select>
-                <p style="font-size: 13px; color: var(--text-muted); margin-top: 10px;">O tipo selecionado filtrará as perguntas da próxima etapa.</p>
-            </div>
-            <div class="btn-nav-group">
-                <button class="btn-apple btn-voltar" onclick="prevStep(3, 'Inspeção: Cavalo')">Voltar</button>
-                <button class="btn-apple btn-avancar" onclick="nextStep(5, 'Inspeção: Carreta')">Avançar: Carreta</button>
-            </div>
+            <div class="card"><h2 style="margin-top: 0;">Identificação da Carreta</h2><div class="form-group"><label>Tipo da Carreta</label><select id="tipoCarreta" class="mobile-select-btn" style="appearance: auto; padding:16px; width:100%; font-weight: 600;" onchange="renderizarPerguntasCarreta()"><option value="padrao">Padrão Geral</option><option value="tanque">Tanque</option><option value="bau">Sider / Baú</option><option value="prancha">Prancha</option><option value="graneleiro">Graneleiro</option></select></div></div>
+            <div class="btn-nav-group"><button class="btn-primary btn-voltar" onclick="prevStep(3, 'Inspeção: Cavalo')">Voltar</button><button class="btn-primary btn-avancar" onclick="nextStep(5, 'Inspeção: Carreta')">Avançar: Carreta</button></div>
         </div>
 
         <div class="step" id="step5">
-            <div class="apple-card">
-                <h2 style="margin-top: 0;">Inspeção: Carreta</h2>
-                <div class="guide-img-container">
-                    <img src="https://placehold.co/800x200/e0e0e0/5a5a5a?text=Guia+Visual:+Engate+e+Carreta" alt="Guia Carreta">
-                </div>
-                <div id="containerPerguntasCarreta"></div>
-            </div>
-            <div class="btn-nav-group">
-                <button class="btn-apple btn-voltar" onclick="prevStep(4, 'Dados da Carreta')">Voltar</button>
-                <button class="btn-apple btn-avancar" style="background-color: var(--success);" onclick="salvarNoBanco()">Gravar no Banco de Dados</button>
-            </div>
+            <div class="card"><h2 style="margin-top: 0;">Inspeção: Carreta</h2><div id="containerPerguntasCarreta"></div></div>
+            <div class="btn-nav-group"><button class="btn-primary btn-voltar" onclick="prevStep(4, 'Identificação da Carreta')">Voltar</button><button class="btn-primary btn-avancar" style="background-color: var(--success);" onclick="salvarNoBanco()">Gravar Checklist</button></div>
         </div>
     </div>
 
-    <script src="menu.js"></script>
+    <div class="modal-overlay" id="seletorModal"><div class="modal-sheet"><div class="modal-header"><h3 id="modalTitle">Selecione</h3><button class="modal-close" onclick="fecharSeletor()">✕</button></div><div class="modal-search"><input type="text" id="modalSearchInput" placeholder="Procurar..." onkeyup="filtrarLista()" autocomplete="off"></div><ul class="modal-list" id="modalList"></ul><div class="modal-empty" id="modalEmpty">Nenhum resultado encontrado.</div></div></div>
+
     <script>
+        const PB_URL = 'https://be8-be8-backend.i6qanl.easypanel.host';
         const token = localStorage.getItem('pb_token');
-        if (!token) { window.location.href = 'login.html'; }
 
-        // Mapeamentos e Configurações
-        let mapas = { transportadoras: {}, motoristas: {}, cavalos: {}, carretas: {} };
-        const POCKETBASE_URL = 'https://be8-be8-backend.i6qanl.easypanel.host';
-        const cabecalhosAuth = { 'Authorization': 'Bearer ' + token };
-
-        // BANCO DE DADOS DINÂMICO (Preenchido via API)
-        let questoesMotorista = [];
-        let questoesCavalo = [];
-        let questoesCarreta = [];
+        let questoesMotorista = [], questoesCavalo = [], questoesCarreta = [];
         let configuracoesSSMA = { diasValidadeCavalo: 30, diasValidadeCarreta: { padrao: 30, tanque: 15, bau: 30, prancha: 10, graneleiro: 30 } };
+        let listas = { transportadora: [], motorista: [], cavalo: [], carreta: [] };
+        let campoAtualId = '';
+        let fotosPorQuestao = {};
 
-        // ==========================================
-        // 1. CARREGAR PERGUNTAS DO POCKETBASE
-        // ==========================================
-        async function carregarConfiguracoesEPerguntas() {
+        document.addEventListener('DOMContentLoaded', () => {
+            if (!token) { window.location.href = 'login.html'; return; }
+            inicializarApp();
+        });
+
+        async function inicializarApp() {
             document.getElementById('loadingScreen').style.display = 'flex';
-            
+            await Promise.all([carregarConfiguracoesEPerguntas(), carregarTransportadoras()]);
+            document.getElementById('loadingScreen').style.display = 'none';
+        }
+
+        async function carregarConfiguracoesEPerguntas() {
+            const headers = { 'Authorization': 'Bearer ' + token };
             try {
-                // 1. Carregar Validades
-                const resVal = await fetch(`${POCKETBASE_URL}/api/collections/site_checklist_config_validade/records?perPage=1`, { headers: cabecalhosAuth });
+                const resVal = await fetch(`${PB_URL}/api/collections/site_checklist_config_validade/records?perPage=1`, { headers });
                 const dataVal = await resVal.json();
-                if (dataVal.items && dataVal.items.length > 0) {
+                if (dataVal.items?.length > 0) {
                     const v = dataVal.items[0];
                     configuracoesSSMA.diasValidadeCavalo = v.dias_cavalo || 30;
                     configuracoesSSMA.diasValidadeCarreta = { padrao: v.dias_padrao||30, tanque: v.dias_tanque||15, bau: v.dias_bau||30, prancha: v.dias_prancha||10, graneleiro: v.dias_graneleiro||30 };
                 }
 
-                // 2. Carregar Perguntas (Apenas as ATIVAS, ordenadas)
-                const resPerg = await fetch(`${POCKETBASE_URL}/api/collections/site_checklist_banco_perguntas/records?perPage=500&filter=(ativo=true)&sort=ordem`, { headers: cabecalhosAuth });
+                const resPerg = await fetch(`${PB_URL}/api/collections/site_checklist_banco_perguntas/records?perPage=500&filter=(ativo=true)&sort=ordem`, { headers });
                 const dataPerg = await resPerg.json();
-
-                if (dataPerg.items) {
-                    dataPerg.items.forEach(p => {
-                        const q = { id: p.id, texto: p.pergunta, tipo: p.tipo_carreta || 'todos', fotoReq: p.foto_obrigatoria };
-                        if(p.categoria === 'motorista') questoesMotorista.push(q);
-                        else if(p.categoria === 'cavalo') questoesCavalo.push(q);
-                        else if(p.categoria === 'carreta') questoesCarreta.push(q);
-                    });
-                }
-                
-                renderizarTodasAsPerguntas();
-                document.getElementById('loadingScreen').style.display = 'none';
-            } catch(e) {
-                console.error(e);
-                alert("Erro ao conectar com o banco de dados das perguntas.");
-                document.getElementById('loadingScreen').style.display = 'none';
-            }
+                dataPerg.items?.forEach(p => {
+                    // ADICIONADO REPROVA AUTOMATICO AQUI (padrão true se não houver)
+                    const q = { id: p.id, texto: p.pergunta, tipo: p.tipo_carreta || 'todos', fotoReq: p.foto_obrigatoria, critica: p.reprova_automatico !== false };
+                    if(p.categoria === 'motorista') questoesMotorista.push(q);
+                    else if(p.categoria === 'cavalo') questoesCavalo.push(q);
+                    else if(p.categoria === 'carreta') questoesCarreta.push(q);
+                });
+                renderizarPerguntas();
+            } catch(e) { console.error(e); }
         }
 
-        // ==========================================
-        // 2. RENDERIZAÇÃO HTML DINÂMICA
-        // ==========================================
-        function gerarHTMLPergunta(pergunta, numero) {
-            const nameRadio = `r_${pergunta.id}`;
-            const idEvidencia = `ev_${pergunta.id}`;
-            const labelFoto = pergunta.fotoReq ? "📷 Anexar Foto (Obrigatória)" : "📷 Anexar Foto (Opcional)";
-
-            return `
-            <div class="question-block" id="block_${pergunta.id}">
-                <div class="question-title"><span>${numero}</span> ${pergunta.texto}</div>
-                <div class="options-grid">
-                    <input type="radio" name="${nameRadio}" id="${pergunta.id}-sim" value="sim"><label for="${pergunta.id}-sim">SIM</label>
-                    <input type="radio" name="${nameRadio}" id="${pergunta.id}-nao" value="nao"><label for="${pergunta.id}-nao">NÃO</label>
-                    <input type="radio" name="${nameRadio}" id="${pergunta.id}-falha" value="falha" onchange="mostrarEvidencia('${idEvidencia}', this)"><label for="${pergunta.id}-falha">FALHA</label>
-                    <input type="radio" name="${nameRadio}" id="${pergunta.id}-na" value="na"><label for="${pergunta.id}-na">N/A</label>
-                </div>
-                <div class="evidence-area" id="${idEvidencia}">
-                    <textarea class="obs-input" id="obs_${pergunta.id}" placeholder="Descreva a falha / avaria encontrada..."></textarea>
-                    <label class="btn-camera">${labelFoto} <input type="file" id="foto_${pergunta.id}" class="file-input" accept="image/*" capture="environment"></label>
-                </div>
-            </div>`;
-        }
-
-        function renderizarTodasAsPerguntas() {
-            document.getElementById('containerPerguntasMotorista').innerHTML = questoesMotorista.map((q, i) => gerarHTMLPergunta(q, i+1)).join('');
-            document.getElementById('containerPerguntasCavalo').innerHTML = questoesCavalo.map((q, i) => gerarHTMLPergunta(q, i+1)).join('');
-            renderizarPerguntasCarreta(); 
+        function renderizarPerguntas() {
+            const htmlPerg = (q, i) => `
+                <div class="question-block">
+                    <div class="question-title"><span>${i+1}</span> ${q.texto} <span style="background:transparent; color:${q.critica ? 'var(--danger)' : '#ff9500'}; font-weight:bold; font-size:12px; margin-left:auto;">${q.critica ? '🚨 Crítica' : '⚠️ Ressalva'}</span></div>
+                    <div class="options-grid">
+                        <input type="radio" name="r_${q.id}" id="${q.id}-sim" value="sim"><label for="${q.id}-sim">SIM</label>
+                        <input type="radio" name="r_${q.id}" id="${q.id}-nao" value="nao"><label for="${q.id}-nao">NÃO</label>
+                        <input type="radio" name="r_${q.id}" id="${q.id}-falha" value="falha" onchange="toggleEvidencia('${q.id}', true)"><label for="${q.id}-falha">FALHA</label>
+                        <input type="radio" name="r_${q.id}" id="${q.id}-na" value="na" onchange="toggleEvidencia('${q.id}', false)"><label for="${q.id}-na">N/A</label>
+                    </div>
+                    <div class="evidence-area" id="ev_${q.id}">
+                        <textarea id="obs_${q.id}" placeholder="Descreva a avaria..."></textarea>
+                        <label class="btn-camera" id="label_foto_${q.id}">${q.fotoReq ? "📷 Foto Obrigatória" : "📷 Foto Opcional"}<input type="file" id="foto_input_${q.id}" accept="image/*" multiple onchange="lidarComFotos(event, '${q.id}')"></label>
+                        <div class="preview-container" id="preview_${q.id}"></div>
+                    </div>
+                </div>`;
+            
+            document.getElementById('containerPerguntasMotorista').innerHTML = questoesMotorista.map(htmlPerg).join('');
+            document.getElementById('containerPerguntasCavalo').innerHTML = questoesCavalo.map(htmlPerg).join('');
+            renderizarPerguntasCarreta();
         }
 
         function renderizarPerguntasCarreta() {
-            const tipoEscolhido = document.getElementById('tipoCarreta').value;
-            const filtradas = questoesCarreta.filter(q => q.tipo === 'todos' || q.tipo === tipoEscolhido);
-            document.getElementById('containerPerguntasCarreta').innerHTML = filtradas.map((q, i) => gerarHTMLPergunta(q, i+1)).join('');
+            const tipo = document.getElementById('tipoCarreta').value;
+            const filtradas = questoesCarreta.filter(q => q.tipo === 'todos' || q.tipo === tipo);
+            const htmlPerg = (q, i) => `
+                <div class="question-block">
+                    <div class="question-title"><span>${i+1}</span> ${q.texto} <span style="background:transparent; color:${q.critica ? 'var(--danger)' : '#ff9500'}; font-weight:bold; font-size:12px; margin-left:auto;">${q.critica ? '🚨 Crítica' : '⚠️ Ressalva'}</span></div>
+                    <div class="options-grid">
+                        <input type="radio" name="r_${q.id}" id="${q.id}-sim" value="sim"><label for="${q.id}-sim">SIM</label>
+                        <input type="radio" name="r_${q.id}" id="${q.id}-nao" value="nao"><label for="${q.id}-nao">NÃO</label>
+                        <input type="radio" name="r_${q.id}" id="${q.id}-falha" value="falha" onchange="toggleEvidencia('${q.id}', true)"><label for="${q.id}-falha">FALHA</label>
+                        <input type="radio" name="r_${q.id}" id="${q.id}-na" value="na" onchange="toggleEvidencia('${q.id}', false)"><label for="${q.id}-na">N/A</label>
+                    </div>
+                    <div class="evidence-area" id="ev_${q.id}">
+                        <textarea id="obs_${q.id}" placeholder="Descreva a avaria..."></textarea>
+                        <label class="btn-camera" id="label_foto_${q.id}">${q.fotoReq ? "📷 Foto Obrigatória" : "📷 Foto Opcional"}<input type="file" id="foto_input_${q.id}" accept="image/*" multiple onchange="lidarComFotos(event, '${q.id}')"></label>
+                        <div class="preview-container" id="preview_${q.id}"></div>
+                    </div>
+                </div>`;
+            document.getElementById('containerPerguntasCarreta').innerHTML = filtradas.map(htmlPerg).join('');
         }
 
-        function mostrarEvidencia(idEvidencia, elementoRadio) {
-            const container = document.getElementById(idEvidencia);
-            const radios = document.getElementsByName(elementoRadio.name);
-            radios.forEach(r => { r.addEventListener('change', function() { container.style.display = this.value === 'falha' ? 'block' : 'none'; }); });
-            container.style.display = 'block';
+        function toggleEvidencia(id, show) { document.getElementById('ev_' + id).style.display = show ? 'block' : 'none'; }
+
+        function lidarComFotos(event, questaoId) {
+            if (!fotosPorQuestao[questaoId]) fotosPorQuestao[questaoId] = [];
+            const arq = Array.from(event.target.files); const vagas = 3 - fotosPorQuestao[questaoId].length;
+            if (arq.length > vagas) alert(`Máximo de 3 fotos. Apenas ${vagas} serão adicionadas.`);
+            fotosPorQuestao[questaoId] = [...fotosPorQuestao[questaoId], ...arq.slice(0, vagas)];
+            event.target.value = ''; atualizarPreviews(questaoId);
         }
 
-        // ==========================================
-        // 3. CARREGAR TRANSPORTADORAS E FROTAS
-        // ==========================================
-        async function initApp() {
-            await carregarConfiguracoesEPerguntas(); // Busca as perguntas primeiro
+        function removerFoto(questaoId, index) { fotosPorQuestao[questaoId].splice(index, 1); atualizarPreviews(questaoId); }
+
+        function atualizarPreviews(questaoId) {
+            const c = document.getElementById(`preview_${questaoId}`); const btn = document.getElementById(`label_foto_${questaoId}`);
+            c.innerHTML = '';
+            fotosPorQuestao[questaoId].forEach((f, i) => {
+                c.innerHTML += `<div class="thumb-wrapper"><img src="${URL.createObjectURL(f)}"><button type="button" class="btn-remove-thumb" onclick="removerFoto('${questaoId}', ${i})">✕</button></div>`;
+            });
+            if (fotosPorQuestao[questaoId].length >= 3) { btn.classList.add('limit-reached'); btn.innerHTML = `⚠️ Limite atingido`; } 
+            else {
+                btn.classList.remove('limit-reached');
+                const q = [...questoesMotorista, ...questoesCavalo, ...questoesCarreta].find(x => x.id === questaoId);
+                btn.innerHTML = `${q.fotoReq ? "📷 Foto Obrigatória" : "📷 Foto Opcional"}<input type="file" id="foto_input_${questaoId}" accept="image/*" multiple onchange="lidarComFotos(event, '${questaoId}')">`;
+            }
+        }
+
+        // --- TRIAGEM E FLUXO ---
+        async function carregarTransportadoras() {
+            const res = await fetch(`${PB_URL}/api/collections/transportadoras/records?sort=razao_social`, { headers: { 'Authorization': 'Bearer ' + token } });
+            const data = await res.json();
+            listas.transportadora = data.items.map(i => ({ id: i.id, nome: i.razao_social }));
+            document.getElementById('btn-transportadora').querySelector('.btn-text').innerText = 'Selecione a Transportadora';
+        }
+
+        async function carregarDependentes(id, nome) {
+            const h = { 'Authorization': 'Bearer ' + token };
             try {
-                const res = await fetch(`${POCKETBASE_URL}/api/collections/transportadoras/records?perPage=100`, { headers: cabecalhosAuth });
-                const data = await res.json();
-                const datalist = document.getElementById('listaTransp');
-                if (data.items) {
-                    data.items.forEach(t => { 
-                        const nome = t.razao_social || t.nome_fantasia || 'Empresa sem nome';
-                        mapas.transportadoras[nome] = t.id; 
-                        datalist.innerHTML += `<option value="${nome}">`; 
-                    });
-                }
-            } catch(e) { console.error("Erro transportadoras:", e); }
-        }
-
-        async function loadAssets() {
-            const nomeDigitado = document.getElementById('iptTransp').value;
-            const transpId = mapas.transportadoras[nomeDigitado]; 
-            
-            document.getElementById('listaMot').innerHTML = ''; document.getElementById('listaVei').innerHTML = ''; document.getElementById('listaCarreta').innerHTML = '';
-            mapas.motoristas = {}; mapas.cavalos = {}; mapas.carretas = {};
-
-            if(!transpId) return; 
-            
-            try {
-                const filtroRelacao = encodeURIComponent(`transportadora_id='${transpId}'`);
-                const resMot = await fetch(`${POCKETBASE_URL}/api/collections/motoristas/records?filter=${filtroRelacao}&perPage=100`, { headers: cabecalhosAuth });
-                const dataMot = await resMot.json();
-                if (dataMot.items) { dataMot.items.forEach(m => { mapas.motoristas[m.nome] = m.id; document.getElementById('listaMot').innerHTML += `<option value="${m.nome}">`; }); }
+                const [rM, rV, rC] = await Promise.all([
+                    fetch(`${PB_URL}/api/collections/motoristas/records?filter=${encodeURIComponent(`transportadora='${nome}'`)}&sort=nome`, { headers: h }),
+                    fetch(`${PB_URL}/api/collections/veiculos/records?filter=${encodeURIComponent(`transportadora_id='${id}' && tipo~'cavalo'`)}&sort=placa`, { headers: h }),
+                    fetch(`${PB_URL}/api/collections/veiculos/records?filter=${encodeURIComponent(`transportadora_id='${id}' && tipo~'reboque'`)}&sort=placa`, { headers: h })
+                ]);
+                const dM = await rM.json(), dV = await rV.json(), dC = await rC.json();
+                listas.motorista = dM.items?.map(i => ({ id: i.id, nome: i.nome })) || [];
+                listas.cavalo = dV.items?.map(i => ({ id: i.id, nome: i.placa, modelo: i.modelo })) || [];
+                listas.carreta = dC.items?.map(i => ({ id: i.id, nome: i.placa, modelo: i.modelo })) || [];
                 
-                const resVei = await fetch(`${POCKETBASE_URL}/api/collections/veiculos/records?filter=${filtroRelacao}&perPage=500`, { headers: cabecalhosAuth });
-                const dataVei = await resVei.json();
-                if (dataVei.items) {
-                    dataVei.items.forEach(v => {
-                        mapas.cavalos[v.placa] = v.id; mapas.carretas[v.placa] = v.id; 
-                        document.getElementById('listaVei').innerHTML += `<option value="${v.placa}">`; document.getElementById('listaCarreta').innerHTML += `<option value="${v.placa}">`;
-                    });
-                }
-            } catch (e) { console.error("Erro frotas:", e); }
+                ['btn-motorista','btn-cavalo','btn-carreta'].forEach(b => { document.getElementById(b).classList.remove('disabled'); document.getElementById(b).querySelector('.btn-icon').innerText = '▼'; });
+                document.getElementById('btn-motorista').querySelector('.btn-text').innerText = 'Selecione o Motorista';
+                document.getElementById('btn-cavalo').querySelector('.btn-text').innerText = 'Selecione o Cavalo';
+                document.getElementById('btn-carreta').querySelector('.btn-text').innerText = 'Selecione a Carreta';
+            } catch(e) {}
         }
 
-        // ==========================================
-        // 4. FUNÇÕES DE UTILIDADE E NAVEGAÇÃO
-        // ==========================================
-        function calcularDataValidade(diasAdicionais) {
-            const data = new Date(); data.setDate(data.getDate() + diasAdicionais); return data.toISOString();
+        function abrirSeletor(t, tit) { campoAtualId = t; document.getElementById('modalTitle').innerText = tit; document.getElementById('modalSearchInput').value = ''; document.getElementById('seletorModal').style.display = 'flex'; renderizarLista(listas[t]); setTimeout(() => document.getElementById('modalSearchInput').focus(), 150); }
+        function fecharSeletor() { document.getElementById('seletorModal').style.display = 'none'; }
+        document.getElementById('seletorModal').onclick = function(e) { if(e.target === this) fecharSeletor(); };
+
+        function renderizarLista(i) {
+            const ul = document.getElementById('modalList'); ul.innerHTML = '';
+            if (!i?.length) { ul.style.display = 'none'; document.getElementById('modalEmpty').style.display = 'block'; return; }
+            ul.style.display = 'block'; document.getElementById('modalEmpty').style.display = 'none';
+            i.forEach(item => { const li = document.createElement('li'); li.innerHTML = `<div><span>${item.nome}</span>${item.modelo ? `<br><small style="color:var(--text-muted)">${item.modelo}</small>` : ''}</div>`; li.onclick = () => selecionarItem(item.id, item.nome, item.modelo); ul.appendChild(li); });
+        }
+        function filtrarLista() { const t = document.getElementById('modalSearchInput').value.toLowerCase(); renderizarLista(listas[campoAtualId].filter(i => i.nome.toLowerCase().includes(t) || i.modelo?.toLowerCase().includes(t))); }
+        function selecionarItem(id, nome, mod) {
+            const b = document.getElementById(`btn-${campoAtualId}`); b.querySelector('.btn-text').innerHTML = mod ? `<div style="line-height:1.2"><b>${nome}</b><br><small>${mod}</small></div>` : nome; b.classList.add('selecionado'); document.getElementById(`input-${campoAtualId}`).value = id;
+            if (campoAtualId === 'transportadora') { ['motorista','cavalo','carreta'].forEach(t=>{const bb=document.getElementById(`btn-${t}`); bb.classList.add('disabled'); bb.classList.remove('selecionado'); bb.querySelector('.btn-text').innerText='Aguardar...'; document.getElementById(`input-${t}`).value='';}); carregarDependentes(id, nome); }
+            fecharSeletor();
         }
 
-        function obterIdDoOperadorLogado() {
-            try { const base64Url = token.split('.')[1]; const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-                const jsonPayload = decodeURIComponent(window.atob(base64).split('').map(function(c) { return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2); }).join(''));
-                return JSON.parse(jsonPayload).id;
-            } catch(e) { return null; }
-        }
+        function nextStep(num, tit) { document.querySelectorAll('.step').forEach(e => e.classList.remove('active')); document.getElementById('step' + num).classList.add('active'); document.getElementById('stepName').innerText = `Etapa ${num}: ${tit}`; document.getElementById('pFill').style.width = (num * 20) + '%'; window.scrollTo(0, 0); }
+        function prevStep(num, tit) { nextStep(num, tit); }
+        function iniciarChecklist() { if(!document.getElementById('input-transportadora').value || !document.getElementById('input-motorista').value || !document.getElementById('input-cavalo').value) { alert("⚠️ Selecione Transportadora, Motorista e Cavalo."); return; } nextStep(2, 'Inspeção: Motorista'); }
+        function decidirCaminhoCarreta() { if(document.getElementById('input-carreta').value) nextStep(4, 'Identificação da Carreta'); else salvarNoBanco(); }
+        function calcularDataValidade(dias) { const d = new Date(); d.setDate(d.getDate() + dias); return d.toISOString(); }
 
-        function nextStep(num, title) { document.querySelectorAll('.step').forEach(el => el.classList.remove('active')); document.getElementById('step' + num).classList.add('active'); document.getElementById('stepName').innerText = `Etapa ${num}: ${title}`; document.getElementById('pFill').style.width = ((num / 5) * 100) + '%'; window.scrollTo(0, 0); }
-        function prevStep(num, title) { nextStep(num, title); }
-
-        // ==========================================
-        // 5. SALVAR NO BANCO DE DADOS
-        // ==========================================
+        // --- SALVAR NO BANCO COM LÓGICA DE REPROVAÇÃO ---
         async function salvarNoBanco() {
-            const idTransp = mapas.transportadoras[document.getElementById('iptTransp').value];
-            const idMot    = mapas.motoristas[document.getElementById('iptMot').value];
-            const idCavalo = mapas.cavalos[document.getElementById('iptVei').value];
-            const idCarreta = mapas.carretas[document.getElementById('iptCarreta').value]; 
-            const idOperador = obterIdDoOperadorLogado();
+            const opToken = token.split('.')[1]; if(!opToken) return; const opId = JSON.parse(atob(opToken.replace(/-/g, '+').replace(/_/g, '/'))).id;
+            document.getElementById('loadingScreen').style.display = 'flex'; document.getElementById('loadingText').innerText = "A processar dados...";
 
-            if(!idTransp || !idMot || !idCavalo) { alert("⚠️ Selecione Transportadora, Motorista e Placa da lista."); return; }
-            if(!idOperador) { alert("🚨 Sessão expirada. Faça login novamente."); return; }
-
-            document.getElementById('loadingText').innerText = "A gravar registo...";
-            document.getElementById('loadingScreen').style.display = 'flex';
-
-            let statusGeral = "Aprovado";
-            const respostasObj = { motorista: {}, cavalo: {}, carreta: {} };
-            let observacoes = [];
             const formData = new FormData();
+            
+            let teveFalhaCritica = false;
+            let teveFalhaSimples = false;
+            
+            let obs = [];
+            const respostas = { motorista: {}, cavalo: {}, carreta: {} };
 
-            // Avalia todas as respostas dinâmicas
-            const todasAsQuestoes = [ ...questoesMotorista.map(q => ({...q, cat: 'motorista'})), ...questoesCavalo.map(q => ({...q, cat: 'cavalo'})), ...questoesCarreta.map(q => ({...q, cat: 'carreta'})) ];
+            [...questoesMotorista, ...questoesCavalo, ...questoesCarreta].forEach(q => {
+                const r = document.querySelector(`input[name="r_${q.id}"]:checked`);
+                if(r) {
+                    const cat = questoesMotorista.includes(q) ? 'motorista' : questoesCavalo.includes(q) ? 'cavalo' : 'carreta';
+                    respostas[cat][q.id] = r.value;
+                    
+                    if(r.value === 'falha') {
+                        // VERIFICA SE A FALHA É CRÍTICA OU SIMPLES
+                        if (q.critica) teveFalhaCritica = true;
+                        else teveFalhaSimples = true;
 
-            todasAsQuestoes.forEach(q => {
-                const radioSelecionado = document.querySelector(`input[name="r_${q.id}"]:checked`);
-                if(radioSelecionado) {
-                    respostasObj[q.cat][q.id] = radioSelecionado.value;
-                    if(radioSelecionado.value === 'falha') {
-                        statusGeral = "Reprovado";
-                        const textoObs = document.getElementById(`obs_${q.id}`)?.value || '';
-                        if(textoObs) observacoes.push(`(Item ${q.texto}) ${textoObs}`);
-                        
-                        const inputArq = document.getElementById(`foto_${q.id}`);
-                        if(inputArq && inputArq.files[0]) formData.append('fotos_evidencias', inputArq.files[0]);
+                        const t = document.getElementById('obs_'+q.id).value;
+                        if(t) obs.push(`(${q.texto}) ${t}`);
+                        if (fotosPorQuestao[q.id]) fotosPorQuestao[q.id].forEach(f => formData.append('fotos_evidencias', f));
                     }
                 }
             });
 
-            formData.append('validade_cavalo', calcularDataValidade(configuracoesSSMA.diasValidadeCavalo));
-            if(idCarreta) {
-                const tipoSelecionado = document.getElementById('tipoCarreta').value;
-                const dias = configuracoesSSMA.diasValidadeCarreta[tipoSelecionado] || 30;
-                formData.append('validade_carreta', calcularDataValidade(dias));
+            // DEFINE O STATUS FINAL BASEADO NA CRITICIDADE
+            let statusFinal = "Aprovado";
+            if (teveFalhaCritica) {
+                statusFinal = "Reprovado";
+            } else if (teveFalhaSimples) {
+                statusFinal = "Aprovado com Ressalvas";
             }
 
-            formData.append('operador_id', idOperador); 
-            formData.append('transportadora_id', idTransp);
-            formData.append('motorista_id', idMot);
-            formData.append('cavalo_id', idCavalo);
-            if(idCarreta) formData.append('carreta_id', idCarreta);
+            formData.append('operador_id', opId);
+            formData.append('transportadora_id', document.getElementById('input-transportadora').value);
+            formData.append('motorista_id', document.getElementById('input-motorista').value);
+            formData.append('cavalo_id', document.getElementById('input-cavalo').value);
+            if(document.getElementById('input-carreta').value) formData.append('carreta_id', document.getElementById('input-carreta').value);
+            formData.append('validade_cavalo', calcularDataValidade(configuracoesSSMA.diasValidadeCavalo));
+            if(document.getElementById('input-carreta').value) { const tipoSel = document.getElementById('tipoCarreta').value; formData.append('validade_carreta', calcularDataValidade(configuracoesSSMA.diasValidadeCarreta[tipoSel] || 30)); }
             
-            formData.append('respostas_json', JSON.stringify(respostasObj));
-            formData.append('status_final', statusGeral);
-            formData.append('observacoes_avarias', observacoes.join(' | '));
+            formData.append('status_final', statusFinal);
+            formData.append('respostas_json', JSON.stringify(respostas));
+            formData.append('observacoes_avarias', obs.join(' | '));
 
             try {
-                const req = await fetch(`${POCKETBASE_URL}/api/collections/site_checklist_registros/records`, { method: 'POST', headers: cabecalhosAuth, body: formData });
-                if (req.ok) {
-                    alert("✅ Checklist gravado com sucesso no banco de dados!");
-                    window.location.reload(); 
-                } else {
-                    const err = await req.json(); alert("🚨 Erro ao salvar: \n" + JSON.stringify(err));
-                    document.getElementById('loadingScreen').style.display = 'none';
-                }
-            } catch(e) {
-                alert("🚨 Erro de conexão."); document.getElementById('loadingScreen').style.display = 'none';
-            }
-        }
+                const res = await fetch(`${PB_URL}/api/collections/site_checklist_registros/records`, { method: 'POST', headers: { 'Authorization': 'Bearer ' + token }, body: formData });
+                document.getElementById('loadingScreen').style.display = 'none';
 
-        initApp();
+                if(res.ok) { 
+                    // Personaliza a tela de sucesso consoante o status
+                    const icon = document.getElementById('iconStatusChecklist');
+                    const title = document.getElementById('tituloStatusChecklist');
+                    
+                    if (statusFinal === "Reprovado") {
+                        icon.innerText = "🛑"; title.innerText = "Checklist REPROVADO"; title.style.color = "var(--danger)";
+                    } else if (statusFinal === "Aprovado com Ressalvas") {
+                        icon.innerText = "⚠️"; title.innerText = "Aprovado c/ Ressalvas"; title.style.color = "#ff9500";
+                    } else {
+                        icon.innerText = "✅"; title.innerText = "Checklist Aprovado!"; title.style.color = "var(--success)";
+                    }
+
+                    document.getElementById('successScreen').style.display = 'flex';
+                } else alert("🚨 Erro ao gravar.");
+            } catch(e) { document.getElementById('loadingScreen').style.display = 'none'; alert("Erro no servidor."); }
+        }
     </script>
 </body>
 </html>
