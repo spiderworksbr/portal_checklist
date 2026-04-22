@@ -6,11 +6,42 @@
     <title>Be8 Go - Novo Checklist</title>
     <link rel="stylesheet" href="style-apple.css">
     <style>
+        /* Variáveis de segurança caso o style-apple.css falhe */
+        :root {
+            --bg: #F2F2F7; 
+            --card: #FFFFFF; 
+            --text: #1C1C1E; 
+            --text-muted: #8E8E93; 
+            --border: rgba(60, 60, 67, 0.15); 
+            --accent: #007AFF; 
+            --danger: #FF3B30; 
+            --success: #34C759; 
+            --warning: #FF9500;
+        }
+
+        [data-theme="dark"], body.force-dark {
+            --bg: #000000; 
+            --card: #1C1C1E; 
+            --text: #F2F2F7; 
+            --text-muted: #98989D; 
+            --border: #38383A; 
+            --accent: #0A84FF; 
+            --danger: #FF453A; 
+            --success: #32D74B; 
+            --warning: #FFD60A;
+        }
+
+        body { background-color: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, sans-serif; margin: 0; padding: 0;}
+        .container { max-width: 800px; margin: 0 auto; padding: 15px; padding-bottom: 80px; }
+
+        .card { background: var(--card); border-radius: 16px; padding: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); border: 1px solid var(--border); margin-bottom: 15px;}
+        body.force-dark .card { box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
+
         .step { display: none; }
         .step.active { display: block; animation: fadeIn 0.3s ease; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         
-        .wizard-header { position: sticky; top: 0; background: var(--bg); padding: 15px 0; z-index: 10; margin-bottom: 20px;}
+        .wizard-header { position: sticky; top: 60px; background: var(--bg); padding: 15px 0; z-index: 10; margin-bottom: 20px; transition: 0.3s;}
         .progress-bar { height: 8px; background: var(--border); border-radius: 4px; overflow: hidden; }
         .progress-fill { height: 100%; background: var(--accent); width: 20%; transition: width 0.4s ease; }
         
@@ -37,11 +68,15 @@
         .btn-camera { display: block; width: 100%; background: var(--border); color: var(--text); text-align: center; padding: 14px; border-radius: 10px; font-weight: 600; cursor: pointer; box-sizing: border-box; }
         .btn-camera input[type="file"] { display: none; }
 
+        .btn-primary { background: var(--accent); color: white; border: none; padding: 14px; border-radius: 12px; font-size: 15px; font-weight: 600; width: 100%; cursor: pointer; transition: 0.2s;}
+        .btn-primary:active { transform: scale(0.98); }
+
         .btn-nav-group { display: flex; gap: 10px; margin-top: 20px; }
         .btn-voltar { background: var(--border) !important; color: var(--text) !important; flex: 0.3; }
         .btn-avancar { flex: 0.7; }
         
         .loading-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.9); z-index: 9999; justify-content: center; align-items: center; flex-direction: column; }
+        body.force-dark .loading-overlay { background: rgba(0,0,0,0.9); }
         .spinner { border: 4px solid #f3f3f3; border-top: 4px solid var(--accent); border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin-bottom: 15px;}
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
@@ -50,6 +85,12 @@
         .thumb-wrapper img { width: 100%; height: 100%; object-fit: cover; }
         .btn-remove-thumb { position: absolute; top: 2px; right: 2px; background: rgba(255,59,48,0.9); color: white; border: none; border-radius: 50%; width: 22px; height: 22px; font-size: 10px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
         .btn-camera.limit-reached { opacity: 0.5; pointer-events: none; background: #e5e5ea; }
+
+        /* Estilos Select Mobile */
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; font-size: 12px; font-weight: 600; color: var(--text-muted); margin-bottom: 5px;}
+        .mobile-select-btn { width: 100%; background: var(--bg); border: 1px solid var(--border); color: var(--text); padding: 14px; border-radius: 10px; text-align: left; display: flex; justify-content: space-between; align-items: center; font-size: 14px; cursor: pointer; }
+        .mobile-select-btn.disabled { opacity: 0.6; cursor: not-allowed; }
 
         /* TELA DE SUCESSO GIGANTE */
         .success-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg); z-index: 10000; flex-direction: column; justify-content: center; align-items: center; padding: 20px; box-sizing: border-box; text-align: center; animation: fadeIn 0.4s ease; }
@@ -60,9 +101,25 @@
         .success-buttons { display: flex; flex-direction: column; gap: 15px; width: 100%; max-width: 400px; }
         .btn-large { padding: 20px; font-size: 18px; border-radius: 16px; font-weight: 700; width: 100%; border: none; cursor: pointer; transition: 0.2s; }
         .btn-large:active { transform: scale(0.98); opacity: 0.9; }
+
+        /* Modal Seletor */
+        .modal-overlay-sheet { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 9999; align-items: flex-end; }
+        .modal-sheet { background: var(--card); width: 100%; height: 80vh; border-radius: 20px 20px 0 0; display: flex; flex-direction: column; animation: slideUp 0.3s ease; }
+        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+        .modal-header { padding: 15px 20px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+        .modal-header h3 { margin: 0; color: var(--text); font-size: 16px; }
+        .modal-close { background: none; border: none; font-size: 20px; color: var(--text-muted); cursor: pointer; }
+        .modal-search { padding: 10px 20px; border-bottom: 1px solid var(--border); }
+        .modal-search input { width: 100%; padding: 12px; border-radius: 10px; border: none; background: var(--bg); font-size: 16px; outline: none; color: var(--text);}
+        .modal-list { flex: 1; overflow-y: auto; list-style: none; margin: 0; padding: 0; }
+        .modal-list li { padding: 15px 20px; border-bottom: 1px solid var(--border); font-size: 16px; color: var(--text); cursor: pointer; }
+        .modal-list li:active { background: var(--bg); }
+        .modal-empty { text-align: center; padding: 30px; color: var(--text-muted); display: none; }
     </style>
 </head>
 <body>
+
+    <div id="menu-container"></div>
 
     <div class="loading-overlay" id="loadingScreen"><div class="spinner"></div><h3 id="loadingText" style="color: var(--text); font-weight: 600;">A carregar...</h3></div>
 
@@ -118,7 +175,9 @@
         </div>
     </div>
 
-    <div class="modal-overlay" id="seletorModal"><div class="modal-sheet"><div class="modal-header"><h3 id="modalTitle">Selecione</h3><button class="modal-close" onclick="fecharSeletor()">✕</button></div><div class="modal-search"><input type="text" id="modalSearchInput" placeholder="Procurar..." onkeyup="filtrarLista()" autocomplete="off"></div><ul class="modal-list" id="modalList"></ul><div class="modal-empty" id="modalEmpty">Nenhum resultado encontrado.</div></div></div>
+    <div class="modal-overlay-sheet" id="seletorModal"><div class="modal-sheet"><div class="modal-header"><h3 id="modalTitle">Selecione</h3><button class="modal-close" onclick="fecharSeletor()">✕</button></div><div class="modal-search"><input type="text" id="modalSearchInput" placeholder="Procurar..." onkeyup="filtrarLista()" autocomplete="off"></div><ul class="modal-list" id="modalList"></ul><div class="modal-empty" id="modalEmpty">Nenhum resultado encontrado.</div></div></div>
+
+    <script src="menu.js"></script>
 
     <script>
         const PB_URL = 'https://be8-be8-backend.i6qanl.easypanel.host';
@@ -155,7 +214,6 @@
                 const resPerg = await fetch(`${PB_URL}/api/collections/site_checklist_banco_perguntas/records?perPage=500&filter=(ativo=true)&sort=ordem`, { headers });
                 const dataPerg = await resPerg.json();
                 dataPerg.items?.forEach(p => {
-                    // ADICIONADO REPROVA AUTOMATICO AQUI (padrão true se não houver)
                     const q = { id: p.id, texto: p.pergunta, tipo: p.tipo_carreta || 'todos', fotoReq: p.foto_obrigatoria, critica: p.reprova_automatico !== false };
                     if(p.categoria === 'motorista') questoesMotorista.push(q);
                     else if(p.categoria === 'cavalo') questoesCavalo.push(q);
@@ -234,7 +292,6 @@
             }
         }
 
-        // --- TRIAGEM E FLUXO ---
         async function carregarTransportadoras() {
             const res = await fetch(`${PB_URL}/api/collections/transportadoras/records?sort=razao_social`, { headers: { 'Authorization': 'Bearer ' + token } });
             const data = await res.json();
@@ -285,7 +342,7 @@
         function decidirCaminhoCarreta() { if(document.getElementById('input-carreta').value) nextStep(4, 'Identificação da Carreta'); else salvarNoBanco(); }
         function calcularDataValidade(dias) { const d = new Date(); d.setDate(d.getDate() + dias); return d.toISOString(); }
 
-        // --- SALVAR NO BANCO COM LÓGICA DE REPROVAÇÃO ---
+        // --- SALVAR NO BANCO ---
         async function salvarNoBanco() {
             const opToken = token.split('.')[1]; if(!opToken) return; const opId = JSON.parse(atob(opToken.replace(/-/g, '+').replace(/_/g, '/'))).id;
             document.getElementById('loadingScreen').style.display = 'flex'; document.getElementById('loadingText').innerText = "A processar dados...";
@@ -305,7 +362,6 @@
                     respostas[cat][q.id] = r.value;
                     
                     if(r.value === 'falha') {
-                        // VERIFICA SE A FALHA É CRÍTICA OU SIMPLES
                         if (q.critica) teveFalhaCritica = true;
                         else teveFalhaSimples = true;
 
@@ -316,13 +372,8 @@
                 }
             });
 
-            // DEFINE O STATUS FINAL BASEADO NA CRITICIDADE
             let statusFinal = "Aprovado";
-            if (teveFalhaCritica) {
-                statusFinal = "Reprovado";
-            } else if (teveFalhaSimples) {
-                statusFinal = "Aprovado com Ressalvas";
-            }
+            if (teveFalhaCritica) { statusFinal = "Reprovado"; } else if (teveFalhaSimples) { statusFinal = "Aprovado com Ressalvas"; }
 
             formData.append('operador_id', opId);
             formData.append('transportadora_id', document.getElementById('input-transportadora').value);
@@ -341,7 +392,6 @@
                 document.getElementById('loadingScreen').style.display = 'none';
 
                 if(res.ok) { 
-                    // Personaliza a tela de sucesso consoante o status
                     const icon = document.getElementById('iconStatusChecklist');
                     const title = document.getElementById('tituloStatusChecklist');
                     
